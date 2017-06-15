@@ -1,3 +1,7 @@
+int sign(float num){
+  return (num > 0) - (num < 0);
+}
+
 float getTime() {
   return millis();
 }
@@ -6,7 +10,7 @@ float updateAngleKalman(){
     double looptime = (double)(micros() - timer) / 1000000; // Calculate delta time
   timer = micros();
   getIMUReadings();
-  float roll = atan2(AcZ, sqrt((AcX * AcX) + (AcY * AcY)) ) * 180 / PI;
+  float roll = atan2(AcZ, sign(AcY) * sqrt((AcX * AcX) + (AcY * AcY)) ) * 180 / PI;
 //  float pitch = atan2(-1 * AcX, AcZ) * 180 / PI;
   double rollRate = -1*GyX;
 //  double pitchRate = GyY;
