@@ -1,0 +1,97 @@
+{
+    "preTestNotes": [
+        "12WEFBN",
+        "10OL,M6",
+        "QPL,87",
+        "1XSE4BHHUU",
+        "QQ1ZXD"
+    ],
+    "testPlot": 1,
+    "colors": {
+        "textView_col": [
+            255,
+            255,
+            255
+        ],
+        "font_col": [
+            127,
+            0,
+            0
+        ],
+        "bcg_col": [
+            0,
+            0,
+            0
+        ]
+    },
+    "maxStartAngle": 5,
+    "sensorBank": {
+        "LOAD_Y": {
+            "loady1": {
+                "unit": "N",
+                "b": 0.0,
+                "a": -120.0,
+                "last": "2017-05-20,10:43"
+            }
+        },
+        "TEMP": {
+            "temp1": {
+                "unit": "C",
+                "b": 25.099999999999994,
+                "a": 6.355287432313019e-16,
+                "last": "2017-05-20,10:43"
+            }
+        },
+        "HUM": {
+            "hum1": {
+                "unit": "%",
+                "b": 0.0,
+                "a": 1.0,
+                "last": "2017-05-20,10:43"
+            }
+        },
+        "IMU": {
+            "imu1": {
+                "unit": "Deg",
+                "b": 0.0,
+                "a": 1.0,
+                "last": "2017-05-20,10:43"
+            }
+        },
+        "LOAD_X": {
+            "loadx1": {
+                "unit": "N",
+                "b": 0.0,
+                "a": -120.0,
+                "last": "2017-05-20,10:43"
+            }
+        },
+        "POT": {
+            "pot1": {
+                "unit": "Deg",
+                "b": 0.0,
+                "a": 5400.0,
+                "last": "2017-05-20,10:43"
+            }
+        }
+    },
+    "sensors": {
+        "LOAD_Y": "loady1",
+        "TEMP": "temp1",
+        "HUM": "hum1",
+        "IMU": "imu1",
+        "LOAD_X": "loadx1",
+        "POT": "pot1"
+    },
+    "postTestNotes": [],
+    "noteBank": [
+        "1WWE",
+        "Q",
+        "WW",
+        "DDDER"
+    ],
+    "dataConfirmFreq": 200,
+    "testFolder": "NEW",
+    "testHeight": 150,
+    "version": "1.0.3"
+}
