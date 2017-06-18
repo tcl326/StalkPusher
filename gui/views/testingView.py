@@ -48,7 +48,7 @@ class TestingView(v.View):
                     {}
                 ),
                 (
-                    {'label':'BREAK HEIGHT', 'id':'selectBtn', 'funct':self.setBreakHeight},
+                    {'label':'BREAK\nHEIGHT', 'id':'selectBtn', 'funct':self.setBreakHeight},
                     {'label':'SELECT', 'id':'selectBtn', 'funct':self.selectBtn},
                     {'label': 'SAVE', 'id': 'saveBtn', 'funct': self.save},
                     {'label': 'REJECT', 'id': 'bckBtn', 'funct': self.drop}
@@ -91,7 +91,7 @@ class TestingView(v.View):
         )
         self.postStnBtnDefs = (
             {'label': 'Load', 'value': 'F','funct': self.switchLoadMode},
-            {'label': 'Rotation', 'value': 'IMU','funct': self.switchRotMode}
+            {'label': 'Rot.', 'value': 'IMU','funct': self.switchRotMode}
         )
 
         self.nlDefs = (
@@ -123,7 +123,7 @@ class TestingView(v.View):
     def makeConfirmMsgs(self):
         #test folder
         self.pushMsg(msg.Message(self.app, self, self.disp,
-                                    'Please confirm or edit test folder.',
+                                    'Confirm/edit test folder.',
                                     'Current test folder: ' + self.app.getSetting(d.TEST_FOLDER),
                                     btnDefs = (
                                         {'label': 'CONFIRM', 'id': 'yesBtn', 'funct': self.popMsg},
@@ -135,7 +135,7 @@ class TestingView(v.View):
                          )
         #plot number
         self.pushMsg(msg.Message(self.app, self, self.disp,
-                                    'Please confirm or edit plot number.',
+                                    'Confirm/edit plot number.',
                                     'Current plot number: ' + str(self.app.getSetting(d.TEST_PLOT)),
                                     btnDefs = (
                                         {'label': 'CONFIRM', 'id': 'yesBtn', 'funct': self.popMsg},
@@ -148,7 +148,7 @@ class TestingView(v.View):
         
         #test height
         self.pushMsg(msg.Message(self.app, self, self.disp,
-                                    'Please confirm or edit test height.',
+                                    'Confirm/edit test height.',
                                     'Current test height: ' + str(self.app.getSetting(d.TEST_HEIGHT)) + 'cm',
                                     btnDefs = (
                                         {'label': 'CONFIRM', 'id': 'yesBtn', 'funct': self.popMsg},
@@ -162,7 +162,7 @@ class TestingView(v.View):
         #plot preTestNotes
         preTestNotes = self.app.getSetting(d.PRE_TEST_NOTES)
         self.pushMsg(msg.Message(self.app, self, self.disp,
-                                    'Please confirm or edit pre-test notes.',
+                                    'Confirm/edit pre-test notes.',
                                     'Current pre-test notes: ' + ', '.join(preTestNotes),
                                     btnDefs = (
                                         {'label': 'CONFIRM', 'id': 'yesBtn', 'funct': self.popMsg},
@@ -629,7 +629,7 @@ class TestingView(v.View):
 #         self.times = np.append(self.times, float(timeValue))
     def focusOn(self):
         self.initPreTestInfoLayout()
-
+        super().focusOn()
     class SettingBtn:
         def __init__(self, app,geoData, metaData, focus, dim = (25*d.px, 18*d.py)):
             self.app = app

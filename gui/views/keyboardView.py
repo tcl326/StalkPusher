@@ -19,7 +19,7 @@ class KeyboardView(v.View):
             (
                 {'label': 'OK', 'id': 'saveBtn', 'funct': self.save},
                 {'label': 'SELECT', 'id': 'selectBtn', 'funct': self.addChar},
-                {'label': 'BACKSPACE', 'id': 'bckSpaceBtn', 'funct': self.backSpace},
+                {'label': 'BACK\nSPACE', 'id': 'bckSpaceBtn', 'funct': self.backSpace},
                 {'label': 'CANCEL', 'id': 'bckBtn', 'funct': self.back}
             )
         ]
@@ -112,10 +112,12 @@ class KeyboardView(v.View):
             self.input = self.input[:-1]
             self.inputRect.setTxt(self.input)
 
+
     def back(self):
         self.goBack()
     def upArrowPress(self):
         self.keyBoard.upArrowPress()
+        self.app.updateScreen()
     def downArrowPress(self):
         self.keyBoard.downArrowPress()
     def leftArrowPress(self):

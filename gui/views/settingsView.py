@@ -126,7 +126,7 @@ class SettingsView(v.View):
         def setFocus(self, focus):
             self.focus = focus
             self.setBcgCol()
-
+            self.app.updateScreen()
         def setTxt(self):
             self.txt = self.font.render(self.label, True, self.fontCol)
         def setFont(self):
@@ -134,7 +134,6 @@ class SettingsView(v.View):
         def setBcgCol(self):
             self.bcgCol = d.textView_highlight_col if self.focus else self.app.textView_col
         def setFontCol(self):
-
             self.fontCol = self.app.font_col
 
         def display(self):

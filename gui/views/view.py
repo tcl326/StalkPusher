@@ -35,11 +35,12 @@ class View(object):
 
         self.initUI()
 
-        self.loadMsgFromStack()
+#         self.loadMsgFromStack()
 
     def setTitleText(self):
         self.font = pg.font.SysFont('Arial', int(5*d.px), bold = True)
         self.titleTxt = self.font.render(self.title, True, d.font_col_inv)
+        
     def loadMsgFromStack(self):
         for msg in self.app.msgStack:
             if msg == 'serialConnFail':
@@ -69,10 +70,14 @@ class View(object):
         self.initButArea()
     def initButArea(self):
         self.butArea = ba.ButArea(self.app, self.btnDefs[self.focusNum])
+        self.app.updateScreen()
+        
     def initButAreaByDefs(self, btnDefs):
         self.butArea = ba.ButArea(self.app, btnDefs)
     def pushMsg(self, msg):
         self.messages.append(msg)
+        self.app.updateScreen()
+
     def deleteMsgByIndex(self, index):
         if index == len(self.messages)-1:
             self.popMsg()
@@ -91,6 +96,8 @@ class View(object):
             self.messages[-1].initButArea()
         else:
             self.initButArea()
+        self.app.updateScreen()
+
     def popAllMsg(self):
         del self.messages[:]
         self.initButArea()
@@ -99,7 +106,6 @@ class View(object):
         return value
     def display(self):
         self.disp.blit(self.titleTxt, (self.titleTxt.get_rect(center=(self.cax, self.cay- 3*d.py-self.caydim/2+self.titleTxt.get_height()))))
-        
         self.displayView()
         
         #display half transparent black cover
@@ -109,7 +115,7 @@ class View(object):
             msg.display()
             
         self.butArea.display()
-
+        
     def displayView(self):
         pass
 #     def display(self):
@@ -227,8 +233,9 @@ class View(object):
     def connectionEstablished(self):
         pass
     def focusOn(self):
-        self.popAllMsg()
         print('focus on')
+        self.popAllMsg()
+        self.app.updateScreen()
     def focusOut(self):
 #         self.popAllMsg()
         print('focus out')

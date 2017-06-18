@@ -42,7 +42,7 @@ class MainView(v.View):
         self.stnBtnsRows = (self.cay + 20*d.py, self.cay + 40*d.py)
 
         self.addStnBtns()
-        
+                
     def setStnFocusNum(self, num):
         self.stnBtnFocusNum = num
     def addStnBtns(self):
@@ -155,10 +155,12 @@ class MainView(v.View):
         def setFocus(self, focus):
             self.focus = focus
             self.setBcgCol()
+            self.app.updateScreen()
 
         def setTxt(self):
             #self.setFont()
             self.txt = self.font.render(self.label + ': ' +self.value, True, self.fontCol)
+            self.app.updateScreen()
         def setFont(self):
             self.font = pg.font.SysFont('Arial', txt.findFontSize(self.label + ': ' +self.value, 'Arial', self.xdim, self.ydim, 4*d.px), bold = True)#self.txtDim
         def setBcgCol(self):

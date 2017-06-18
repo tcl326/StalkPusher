@@ -31,11 +31,12 @@ class RectLabel:
             self.setFontCol(fontCol)  
                       
 #         self.setTxt(self.label)
-        self.setTxt(self.displayStr)
         self.s = pg.Surface((self.xdim, self.ydim), pg.SRCALPHA)  # per-pixel alpha
         self.setBcgCol(txtData['color'])
 #         self.s.fill(self.bcgCol)
         self.setHasBorder(False)
+        
+        self.setTxt(self.displayStr)
 
         self.hasBorder = False
     def setBcgCol(self, bcgCol):
@@ -47,7 +48,7 @@ class RectLabel:
         
     def setFontCol(self, fontCol):
         self.fontCol = fontCol
-        self.setTxt(self.label)
+#         self.setTxt(self.label)
 
     def setFont(self, dim):
 #         self.font = pg.font.SysFont('Arial', int(dim), bold = True)
@@ -60,12 +61,17 @@ class RectLabel:
 
     def setTxt(self, label):
         self.txt = self.font.render(str(label), True, self.fontCol)
+        self.display()
+    
     def display(self):
         self.show(self.x, self.y)
+    
     def displayWithY(self, y):
         self.show(self.x, y)
+    
     def show(self, x, y):
         self.disp.blit(self.s, (x - self.xdim / 2, y - self.ydim / 2, self.xdim, self.ydim))
         self.disp.blit(self.txt, (self.txt.get_rect(center=(x, y))))
         if self.hasBorder:
             pg.draw.rect(self.disp, [0, 0, 255], (x - self.xdim/2,y - self.ydim / 2,self.xdim,self.ydim), 5)
+        self.app.updateScreen()

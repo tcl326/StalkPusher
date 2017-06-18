@@ -17,7 +17,7 @@ UPDATE_INTERVAL = 0.1#seconds
 class LiveFeedView(v.View):
     def __init__(self, app, prevView = None):
         self.btnDefs = [(
-                {'label': 'STOP-START', 'id': 'bckbtn', 'funct': self.uPause},
+                {'label': 'STOP/\nSTART', 'id': 'bckbtn', 'funct': self.uPause},
                 {'label': 'ADC', 'id': 'bckbtn', 'funct': self.toADC},
                 {},#'label': 'Except', 'id': 'bckbtn', 'funct': self.throwExc
                 {'label': 'BACK', 'id': 'bckbtn', 'funct': self.back},
@@ -237,6 +237,7 @@ class LiveFeedView(v.View):
 
         def setTxt(self):
             self.txt = self.font.render(self.label + ': ' +self.value, True, self.fontCol)
+            self.app.updateScreen()
         def setFont(self):
             self.font = pg.font.SysFont('Arial', self.txtDim,bold = True)
         def setBcgCol(self):

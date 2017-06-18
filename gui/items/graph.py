@@ -38,7 +38,6 @@ class Graph:
 #         self.ax.set_facecolor(d.convertColor(d.graphBcg_col))
         self.canvas = agg.FigureCanvasAgg(self.fig)
         self.clear()
-#         pass
     def setXLabel(self, label):
         plt.xlabel(label)       
 #         pass 

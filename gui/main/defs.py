@@ -39,10 +39,10 @@ setting_file_path = MAINAPP_PATH + '/appData.json'
 # Screen Geometry
 #in pixels
 pg.init()
-FULLSCREEN = 1
+FULLSCREEN = 0
 infoObject = pg.display.Info()
-width = infoObject.current_w
-height = infoObject.current_h
+width = infoObject.current_w/2
+height = infoObject.current_h/2
 # width = 640
 # height = 480
 px = width/100.0

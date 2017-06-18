@@ -1,7 +1,7 @@
 import pygame as pg
 import defs as d
 from items import rectLabel as rl
-
+from utils import text as txt
 class Message:
     def __init__(self, app, view, disp, ttlTxt, msgTxt,
                   geoData = {'x':62.5*d.px, 'y': 50*d.py, 'xdim': 70*d.px, 'ydim': 50*d.py},
@@ -32,6 +32,7 @@ class Message:
         self.msg = rl.RectLabel(self.app,
                                 {'x':self.x, 'y': self.y, 'xdim': 70*d.px, 'ydim': 10*d.py},
                                 {'txt':self.msgTxt,'txtDim':2.5*d.px,'color':self.app.textView_col})
+        self.font = pg.font.SysFont('Arial', 18)
         self.initButArea()
     def initButArea(self):
         self.view.initButAreaByDefs(self.btnDefs)
@@ -42,5 +43,6 @@ class Message:
         #display title
         self.ttl.display()
         #display message
-        self.msg.display()
+        txt.multilineText(self.disp, self.msgTxt, [self.x-self.xdim/2, self.y-self.ydim/2],[self.xdim, self.ydim], self.font, self.app.font_col)
+#         self.msg.display()
         

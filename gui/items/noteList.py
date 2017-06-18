@@ -85,8 +85,7 @@ class NoteList():
         else:
             if not self.isEmpty():
                 self.notes[self.focusNum].setFocus(False)
-#     def hasFocus(self):
-#         return self.hasFocus
+        
     def determineLayout(self):
         self.noteHeight = 5*d.py
         self.interNoteSpace = 1*d.py
@@ -162,6 +161,7 @@ class NoteList():
                 self.setFocusNum(self.focusNum+1)
                 
         self.reSetItemsAv()
+        self.app.updateScreen()
     def refocusOn(self, num):#startIndex
         self.startIndex = num
         self.endIndex = min(len(self.list)-self.startIndex-1, len(self.list)-1)
@@ -169,6 +169,7 @@ class NoteList():
         self.setFocusNum(self.startIndex)
         self.itemsAvUplbl.setTxt('+'+str(self.startIndex)+'...')           
         self.itemsAvDownlbl.setTxt('+'+str(len(self.list)-self.endIndex-1)+'...')
+        self.app.updateScreen()
 
     def appendNote(self, noteContent):
         self.list.append(noteContent)
@@ -182,6 +183,7 @@ class NoteList():
             self.setFocusNum(0)
         self.reSetItemsAv()
         
+        self.app.updateScreen()
 
     def removeNote(self):
         if self.isEmpty(): return
@@ -202,6 +204,7 @@ class NoteList():
             self.notes[self.focusNum].setFocus(True)
             
         self.reSetItemsAv()
+        self.app.updateScreen()
 
         return noteContent
     def display(self):
@@ -233,6 +236,7 @@ class NoteList():
         
         
         self.reSetItemsAv()
+        self.app.updateScreen()
 
     def downArrowPress(self):
         if self.isEmpty(): return
@@ -246,6 +250,7 @@ class NoteList():
         elif self.focusNum < self.endIndex:
             self.setFocusNum(self.focusNum + 1)
         self.reSetItemsAv()
+        self.app.updateScreen()
 
     def selectCurrent(self):
         if not self.isEmpty():
@@ -291,7 +296,11 @@ class NoteList():
             self.txtDim = txtData['txtDim']
             txtData['color'] = self.app.font_col#d.light_blue if self.focus else d.light_gray
             self.rectLabel = rl.RectLabel(self.app, geoData, txtData, wrap = 'single-inline')
-            self.setFocus(focus)
+            
+            self.focus = focus
+            # self.rectLabel.setBcgCol(d.light_blue if self.focus else d.light_gray)
+            self.rectLabel.setHasBorder(True if self.focus else False)
+            
             self.setIsSelected(False)
         def isSelection(self):
             return self.isSelected
@@ -299,6 +308,8 @@ class NoteList():
             self.focus = focus
             # self.rectLabel.setBcgCol(d.light_blue if self.focus else d.light_gray)
             self.rectLabel.setHasBorder(True if self.focus else False)
+            self.app.updateScreen()
+
         def selectToggle(self):
             self.setIsSelected(not self.isSelected)
         def select(self):
@@ -310,7 +321,11 @@ class NoteList():
         def setIsSelected(self, isSelected):
             self.isSelected = isSelected
             self.rectLabel.setBcgCol(d.textView_highlight_col if self.isSelected else self.app.textView_col)
+            self.app.updateScreen()
+
         def setYPos(self, y):
             self.y = y
+            self.app.updateScreen()
+
         def display(self, y):
             self.rectLabel.displayWithY(y)

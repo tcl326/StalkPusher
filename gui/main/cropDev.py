@@ -47,14 +47,17 @@ class CropDevMain:
         pg.mouse.set_visible(False)
         self.clock = pg.time.Clock()
 #         self.bcgCol = list(d.bcg_col)
-        
+        self.blitScreen = True
         self.createViews()
-
+        
         self.setView(self.mainView)
         self.view.getAll()
         self.btnInput.resetBtnPresses()
         self.running = True
-        
+    def updateScreen(self):
+#         if not self.blitScreen:
+        print('update screen')
+        self.blitScreen = True       
     def createViews(self):
 
         self.mainView = mv.MainView(self)
@@ -110,8 +113,7 @@ class CropDevMain:
     def loop(self):
         while self.running:
 #             try:
-            self.disp.fill(self.bcg_col)
-            self.view.display()
+#             self.view.display()
             
             self.btnInput.checkInput()
             self.checkBtns()
@@ -137,7 +139,15 @@ class CropDevMain:
                         self.takeScreenshot()
                 if event.type == pg.QUIT:
                     self.exit()
-            pg.display.update()
+            if self.blitScreen:
+                print('display.update() start')
+
+                self.disp.fill(self.bcg_col)
+                self.view.display()
+                pg.display.update()
+                self.blitScreen = False
+                print('display.update() end')
+
             self.clock.tick(60)
             ##########################   TO BE UNCOMMENTED
 #             except Exception as e:

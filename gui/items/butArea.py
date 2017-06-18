@@ -16,6 +16,7 @@ class ButArea:
         self.disp = self.app.disp
         self.btnDefs = btnDefs
         self.addBtns()
+        
     def addBtns(self):
         self.btns = []
         for i in range(4):

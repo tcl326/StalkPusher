@@ -115,3 +115,5 @@ class Keyboard:
         def setFocus(self, focus):
             self.focus = focus
             self.rectLabel.setBcgCol(d.textView_highlight_col if self.focus else self.app.textView_col)
+            self.app.updateScreen()
+

@@ -112,7 +112,7 @@ class NumChoice:
                 self.rectLabel.setBcgCol(d.textView_highlight_col)
             else:
                 self.rectLabel.setBcgCol((self.app.textView_col))
-
+            self.app.updateScreen()
         def display(self):
             self.rectLabel.display()
             if (self.focus):
