@@ -33,7 +33,7 @@ class MainView(v.View):
         super().__init__(app)
 
         self.caTtlfont = pg.font.SysFont('Arial', 40, bold = True)
-        self.caTtltxt = self.caTtlfont.render('CROP DEVICE 1.0.2', True, d.font_col_inv)
+        self.caTtltxt = self.caTtlfont.render('CROP DEVICE ' + self.app.getSetting(d.VERSION), True, d.font_col_inv)
 
         self.numStnBtnRow = 2
         self.numStnBtnCom = 2
@@ -181,7 +181,7 @@ class MainView(v.View):
                                 btnDefs = (
                                     {'label': 'EXIT', 'id': 'exitBtn', 'funct': self.bringExitMsg},
                                     {'label': 'RESTART', 'id': 'restartBtn', 'funct': self.bringRestartMsg},
-                                    {'label': 'SHUTDOWN', 'id': 'shutdownBtn', 'funct': self.bringShutdownMsg},
+                                    {'label': 'SHUT\nDOWN', 'id': 'shutdownBtn', 'funct': self.bringShutdownMsg},
                                     {'label': 'CANCEL', 'id': 'cancelBtn', 'funct': self.popMsg}
                                 )
                                 )
@@ -199,19 +199,6 @@ class MainView(v.View):
                                 )
                                 )
                      )
-#     def bringRestartMsg(self):
-#         from items import message as ms
-#         self.pushMsg(ms.Message(self.app, self, self.disp,
-#                                 'Restarting Device...',
-#                                 'Are you sure?',
-#                                 btnDefs = (
-#                                     {'label': 'Yes', 'id': 'yesBtn', 'funct': self.app.restartPi},
-#                                     {'label': 'No', 'id': 'noBtn', 'funct': self.popMsg},
-#                                     {},
-#                                     {}
-#                                 )
-#                                 )
-#                      )
     def bringExitMsg(self):
         from items import message as ms
         self.pushMsg(ms.Message(self.app, self, self.disp,

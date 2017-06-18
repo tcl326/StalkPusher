@@ -20,19 +20,19 @@ class NotesSettingView(v.View):
                 {'label': 'SAVE', 'id': 'saveBtn', 'funct': self.save},
                 {'label': 'REMOVE', 'id': 'removeNoteBtn', 'funct': self.removeNote},
                 {},
-                {'label': 'NOTE MANAGER', 'id': 'noteMngBtn', 'funct': self.toNoteManager}
+                {'label': 'NOTE\nMANAGER', 'id': 'noteMngBtn', 'funct': self.toNoteManager}
             ),
             (
                 {'label': 'SAVE', 'id': 'saveBtn', 'funct': self.save},
                 {'label': 'REMOVE', 'id': 'removeNoteBtn', 'funct': self.removeNote},
                 {},
-                {'label': 'NOTE MANAGER', 'id': 'noteMngBtn', 'funct': self.toNoteManager}
+                {'label': 'NOTE\nMANAGER', 'id': 'noteMngBtn', 'funct': self.toNoteManager}
             ),
             (
                 {'label': 'SAVE', 'id': 'saveBtn', 'funct': self.save},
-                {'label': 'ADD TO PRE-TEST', 'id': 'addToCurr', 'funct': self.addToPreTest},                
-                {'label': 'ADD TO POST-TEST', 'id': 'addToCurr', 'funct': self.addToPostTest},
-                {'label': 'NOTE MANAGER', 'id': 'noteMngBtn', 'funct': self.toNoteManager}
+                {'label': 'ADD TO\nPRE-TEST', 'id': 'addToCurr', 'funct': self.addToPreTest},                
+                {'label': 'ADD TO\nPOST-TEST', 'id': 'addToCurr', 'funct': self.addToPostTest},
+                {'label': 'NOTE\nMANAGER', 'id': 'noteMngBtn', 'funct': self.toNoteManager}
             )
         ]
         super().__init__(app, prevView)

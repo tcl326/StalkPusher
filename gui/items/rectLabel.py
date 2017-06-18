@@ -6,23 +6,32 @@ txtData {label, txtDim, color}
 '''
 import pygame as pg
 import defs as d
+from utils import text as txt
 
 class RectLabel:
-    def __init__(self, app, geoData, txtData, fontCol = 0):
+    def __init__(self, app, geoData, txtData, fontCol = 0, wrap = 'single-inline'):
         self.app = app
         self.disp = self.app.disp
         self.x = geoData['x']
         self.y = geoData['y']
         self.xdim = geoData['xdim']
         self.label = txtData['txt']
+        self.displayStr = self.label
         self.ydim = geoData['ydim']
+        
         self.txtDim = int(txtData['txtDim'])
+        
+        self.wrap = wrap
+        
         self.setFont(self.txtDim)
+        
         if not fontCol:
             self.setFontCol(self.app.font_col)
         else:
-            self.setFontCol(fontCol)            
-        self.setTxt(self.label)
+            self.setFontCol(fontCol)  
+                      
+#         self.setTxt(self.label)
+        self.setTxt(self.displayStr)
         self.s = pg.Surface((self.xdim, self.ydim), pg.SRCALPHA)  # per-pixel alpha
         self.setBcgCol(txtData['color'])
 #         self.s.fill(self.bcgCol)
@@ -32,15 +41,22 @@ class RectLabel:
     def setBcgCol(self, bcgCol):
         self.bcgCol = bcgCol
         self.s.fill(self.bcgCol)
+        
     def setHasBorder(self, hasBorder):
         self.hasBorder = hasBorder
+        
     def setFontCol(self, fontCol):
         self.fontCol = fontCol
         self.setTxt(self.label)
 
-    def setFont(self,dim):
-        self.font = pg.font.SysFont('Arial', int(dim), bold = True)
-#         self.setTxt(self.label)
+    def setFont(self, dim):
+#         self.font = pg.font.SysFont('Arial', int(dim), bold = True)
+        
+        if self.wrap == 'single-inline':
+            self.displayStr , self.txtDim = txt.findInclString(self.label, 'Arial', self.xdim, self.ydim)            
+            self.font = pg.font.SysFont('Arial', self.txtDim, bold = True)
+        else:
+            self.font = pg.font.SysFont('Arial', txt.findFontSize(self.displayString, 'Arial', self.xdim, self.ydim, 4*d.px), bold = True, wrap = self.wrap)#self.txtDim
 
     def setTxt(self, label):
         self.txt = self.font.render(str(label), True, self.fontCol)

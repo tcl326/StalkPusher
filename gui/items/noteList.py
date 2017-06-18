@@ -290,7 +290,7 @@ class NoteList():
             self.label = txtData['txt']
             self.txtDim = txtData['txtDim']
             txtData['color'] = self.app.font_col#d.light_blue if self.focus else d.light_gray
-            self.rectLabel = rl.RectLabel(self.app, geoData, txtData)
+            self.rectLabel = rl.RectLabel(self.app, geoData, txtData, wrap = 'single-inline')
             self.setFocus(focus)
             self.setIsSelected(False)
         def isSelection(self):

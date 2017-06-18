@@ -39,10 +39,10 @@ setting_file_path = MAINAPP_PATH + '/appData.json'
 # Screen Geometry
 #in pixels
 pg.init()
-FULLSCREEN = 0
+FULLSCREEN = 1
 infoObject = pg.display.Info()
-width = infoObject.current_w/2
-height = infoObject.current_h/2
+width = infoObject.current_w
+height = infoObject.current_h
 # width = 640
 # height = 480
 px = width/100.0
@@ -97,6 +97,7 @@ SENSOR_BANK = 'sensorBank'
 COLORS = 'colors'
 DATA_CONFIRM_FREQ = 'dataConfirmFreq'
 MAX_START_ANGLE = 'maxStartAngle'
+VERSION = 'version'
 #sensor types data strings
 DS_LOAD_X = 'LOAD_X'
 DS_LOAD_Y = 'LOAD_Y'
@@ -115,7 +116,7 @@ SENSOR_FIELDS = [SENSOR_UNIT, SENSOR_A, SENSOR_B, SENSOR_LAST]
 
 dataStrings = [TEST_HEIGHT, TEST_PLOT, PRE_TEST_NOTES, POST_TEST_NOTES,
                 NOTE_BANK, TEST_FOLDER, SENSORS, SENSOR_BANK,
-                 COLORS, DATA_CONFIRM_FREQ, MAX_START_ANGLE]
+                 COLORS, DATA_CONFIRM_FREQ, MAX_START_ANGLE, VERSION]
 #Sensors
 sensorDataStrings = [DS_LOAD_X, DS_LOAD_Y, DS_IMU, DS_POT, DS_TEMP, DS_HUM]
 
