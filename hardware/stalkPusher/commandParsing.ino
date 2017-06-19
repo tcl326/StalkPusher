@@ -6,44 +6,38 @@ void resetStreamBool() {
   sendAll = false;
 }
 
-//void stopFeed(){
-//  
-//}
-
-void streamFeed(){
-    String dataToSend = "";
-    int dataLength = 0;
-    prepareData(String(getTime()), "MI", dataToSend, dataLength);
-    prepareData(String(getAngleIMU()), "AI", dataToSend, dataLength);
-    prepareData(String(getAnglePot()), "AP", dataToSend, dataLength);
-    if (single){
-      prepareData(String(getForce()), "FO", dataToSend, dataLength);
-    }
-    else{
-      prepareData(String(getForceX()), "FX", dataToSend, dataLength);
-      prepareData(String(getForceY()), "FY", dataToSend, dataLength);
-    }
-    prepareData(String(getTimeStamp()), "TI", dataToSend, dataLength);
-    prepareData(String(getLocation()), "LO", dataToSend, dataLength);
-    prepareData(String(getTemp()), "TE", dataToSend, dataLength);
-    prepareData(String(getHumidity()), "HU", dataToSend, dataLength);
-    sendData(dataToSend, dataLength);
-    delay(10);
+void streamFeed() {
+  String dataToSend = "";
+  int dataLength = 0;
+  prepareData(String(getTime()), "MI", dataToSend, dataLength);
+  prepareData(String(getAngleIMU()), "AI", dataToSend, dataLength);
+  prepareData(String(getAnglePot()), "AP", dataToSend, dataLength);
+  if (single) {
+    prepareData(String(getForce()), "FO", dataToSend, dataLength);
+  }
+  else {
+    prepareData(String(getForceX()), "FX", dataToSend, dataLength);
+    prepareData(String(getForceY()), "FY", dataToSend, dataLength);
+  }
+  prepareData(String(getTimeStamp()), "TI", dataToSend, dataLength);
+  prepareData(String(getLocation()), "LO", dataToSend, dataLength);
+  prepareData(String(getTemp()), "TE", dataToSend, dataLength);
+  prepareData(String(getHumidity()), "HU", dataToSend, dataLength);
+  sendData(dataToSend, dataLength);
+  delay(10);
 }
 
 void streaming() {
   String dataToSend = "";
   int dataLength = 0;
-//  String value = "0000";
-//  float start = millis();
-  if (sendAll){
+  if (sendAll) {
     prepareData(String(getTime()), "MI", dataToSend, dataLength);
     prepareData(String(getAngleIMU()), "AI", dataToSend, dataLength);
     prepareData(String(getAnglePot()), "AP", dataToSend, dataLength);
-    if (single){
+    if (single) {
       prepareData(String(getForce()), "FO", dataToSend, dataLength);
     }
-    else{
+    else {
       prepareData(String(getForceX()), "FX", dataToSend, dataLength);
       prepareData(String(getForceY()), "FY", dataToSend, dataLength);
     }
@@ -52,37 +46,28 @@ void streaming() {
     prepareData(String(getTemp()), "TE", dataToSend, dataLength);
     prepareData(String(getHumidity()), "HU", dataToSend, dataLength);
     delay(10);
-  }else{
+  } else {
 
-  if (sendTime) {
-    prepareData(String(getTime()), "MI", dataToSend, dataLength);
-  }
-//  float endTime = millis();
-//  Serial.println(start-endTime);
-//  start = millis();
-  if (sendAngle) {
-    prepareData(String(getAngleIMU()), "AI", dataToSend, dataLength);
-    prepareData(String(getAnglePot()), "AP", dataToSend, dataLength);
-  }
-//  endTime = millis();
-//  Serial.println(start-endTime);
-//  start = millis();
-  if (sendForce) {
-    if (single){
-      prepareData(String(getForce()), "FO", dataToSend, dataLength);
+    if (sendTime) {
+      prepareData(String(getTime()), "MI", dataToSend, dataLength);
     }
-    else{
-      prepareData(String(getForceX()), "FX", dataToSend, dataLength);
-      prepareData(String(getForceY()), "FY", dataToSend, dataLength);
+
+    if (sendAngle) {
+      prepareData(String(getAngleIMU()), "AI", dataToSend, dataLength);
+      prepareData(String(getAnglePot()), "AP", dataToSend, dataLength);
+    }
+
+    if (sendForce) {
+      if (single) {
+        prepareData(String(getForce()), "FO", dataToSend, dataLength);
+      }
+      else {
+        prepareData(String(getForceX()), "FX", dataToSend, dataLength);
+        prepareData(String(getForceY()), "FY", dataToSend, dataLength);
+      }
     }
   }
-  }
-//  endTime = millis();
-//  Serial.println(start-endTime);
-  //if (millis() - streamTimer  >= 10){
-    sendData(dataToSend, dataLength);
-//    streamTimer = millis();
-  //}
+  sendData(dataToSend, dataLength);
 }
 
 void perCall() {
@@ -90,25 +75,16 @@ void perCall() {
   int dataLength = 0;
   String value = "0000";
   if (sendTimeStamp) {
-//    Serial.println("TI");
     prepareData(String(getTimeStamp()), "TI", dataToSend, dataLength);
-//    Serial.println(dataToSend);
   }
   if (sendLocation) {
-//    Serial.println("LO");
     prepareData(String(getLocation()), "LO", dataToSend, dataLength);
-//    Serial.println(dataToSend);
   }
   if (sendTemp) {
-//    Serial.println("TE");
-//    Serial.println(dataToSend);
     prepareData(String(getTemp()), "TE", dataToSend, dataLength);
-//    Serial.println(dataToSend);
   }
   if (sendHumidity) {
-//    Serial.println("HU");
     prepareData(String(getHumidity()), "HU", dataToSend, dataLength);
-//    Serial.println(dataToSend);
   }
   sendData(dataToSend, dataLength);
   toPerCall = false;
@@ -144,8 +120,6 @@ void parser (String &command, String &value, char dataInputBuffer[], int stringL
     }
 
   }
-  //  Serial.println(valueBuffer);
-  //  Serial.println(dataInputBuffer);
   for (int c = 0; c < 4; c++) {
 
     if (valueBuffer[c]) {
