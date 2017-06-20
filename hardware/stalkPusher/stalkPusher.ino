@@ -208,8 +208,5 @@ void loop() {
   if (liveFeed){
     streamFeed();
   }
-//  else {
-//    stopFeed();
-//  }
   updateAngleKalman();
 }
