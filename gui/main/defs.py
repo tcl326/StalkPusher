@@ -10,6 +10,12 @@ def readSettings():
     with open(setting_file_path, 'r') as data_file:
         data = json.load(data_file)
         return data
+def readSettingFromFile(file_path):
+    import json
+    with open(file_path, 'r') as data_file:
+        data = json.load(data_file)
+        return data
+
 #return a given setting
 def getSetting(setting):
     import json
@@ -28,21 +34,27 @@ def saveSetting(setting, value):
 
 # if __name__ == "__main__":
 #critical paths
-APP_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-MAINAPP_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)))
-USB_TEST_FOLDERS_PATH = '/media/cropDevUsb'#'../tests'
-RASPI_TEST_FOLDERS_PATH = '/home/pi/Documents/cropDevUsb'#'../tests'
-TEST_FOLDER_PATH = '/tests'
+APP_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))#../gui/
+MAINAPP_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)))#../gui/main/
+
+USB_DATA_PATH = '/home/pi/Documents/cropDevUsb'#'/media/cropDevUsb'#'../tests'
+RASPI_DATA_PATH = '/home/pi/Documents/cropDevUsb'#'../tests'
+TESTS_DIR = '/tests'
+UPDATE_DIR = '/update'
+
 #setting file
 setting_file_path = MAINAPP_PATH + '/appData.json'
 
 # Screen Geometry
 #in pixels
 pg.init()
-FULLSCREEN = 0
+FULLSCREEN = 1
 infoObject = pg.display.Info()
-width = infoObject.current_w/2
-height = infoObject.current_h/2
+width = infoObject.current_w
+height = infoObject.current_h
+if not FULLSCREEN:
+    width = width/2
+    height = height/2
 # width = 640
 # height = 480
 px = width/100.0
@@ -84,6 +96,16 @@ btnAreaGeo = [{'x':12.5*px,'y':12.5*py,'xdim':btnXdim-2*xMargin,'ydim':btnYdim-2
        {'x':12.5*px,'y':37.5*py,'xdim':btnXdim-2*xMargin,'ydim':btnYdim-2*yMargin},
        {'x':12.5*px,'y':62.5*py,'xdim':btnXdim-2*xMargin,'ydim':btnYdim-2*yMargin},
        {'x':12.5*px,'y':87.5*py,'xdim':btnXdim-2*xMargin,'ydim':btnYdim-2*yMargin}]
+
+#Default font sizes, some change dynamically.
+BTN_FS = int(3.8*px)
+VIEW_TTL_FS = int(3.8*px)
+NL_FS = int(3.8*px)
+STN_BTN_FS = int(3.8*px)
+MSG_TTL_FS = int(3.8*px)
+MSG_BD_FS = int(3.8*px)
+KB_KEY_FS = int(3.8*px)
+NK_FS = int(4*px)
 
 #data strings
 TEST_HEIGHT = 'testHeight'
@@ -140,6 +162,11 @@ WORD = 'WORD'
 
 MAX_NOTES = 5 #max notes per test
 
+
+#default colors
+bcg_col_d = black
+font_col_d = black
+#colors
 textView_highlight_col = green#white#red
 textView_neg_col = white#red
 textView_pos_col = white#green
@@ -157,5 +184,6 @@ def darkenColor(color):
     return [int(0.5*x) for x in color]
 def brightenColor(color):
     return [255 if (int(2*x) % 255) < x else (int(2*x) % 255) for x in color]
-    
+def invertColor(color):
+    return [255 - x for x in color]    
 

@@ -16,7 +16,8 @@ import pygame as pg
 import defs as d
 import items.butArea as ba
 from hardware import hdInterface2 as hd
-
+from utils import text as txt
+from items import viewBtn as vb
 TIME_DEL = '_'
 class View(object):
     def __init__(self, app, prevView = None):
@@ -31,15 +32,10 @@ class View(object):
         self.caydim = d.caGeo['ydim']
         self.focusNum = 0
 
-        self.setTitleText()
-
         self.initUI()
 
 #         self.loadMsgFromStack()
 
-    def setTitleText(self):
-        self.font = pg.font.SysFont('Arial', int(5*d.px), bold = True)
-        self.titleTxt = self.font.render(self.title, True, d.font_col_inv)
         
     def loadMsgFromStack(self):
         for msg in self.app.msgStack:
@@ -105,7 +101,15 @@ class View(object):
     def keyboardReturn(self, key, value, status = 1):
         return value
     def display(self):
-        self.disp.blit(self.titleTxt, (self.titleTxt.get_rect(center=(self.cax, self.cay- 3*d.py-self.caydim/2+self.titleTxt.get_height()))))
+        
+        txt.spu(self.disp,
+                self.title,
+                (self.cax, self.cay),
+                self.app.viewTtlFont,
+                d.invertColor(self.app.bcg_col)
+                )
+        
+#         self.disp.blit(self.titleTxt, (self.titleTxt.get_rect(center=(self.cax, self.cay- 3*d.py-self.caydim/2+self.titleTxt.get_height()))))
         self.displayView()
         
         #display half transparent black cover

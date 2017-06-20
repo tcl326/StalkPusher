@@ -21,14 +21,9 @@ from utils import text as txt
 from views import keyboardView as kbv
 from items import message as msg
 from utils import postProcess as pp
-
 preTest = 0
 inTest = 1
 postTest = 2
-
-# USB_TEST_FOLDERS_PATH = '/media/cropDevUsb'#'../tests'
-# RASPI_TEST_FOLDERS_PATH = '/home/pi/Documents/cropDevUsb'#'../tests'
-# TEST_FOLDER = '/tests'
 
 
 class TestingView(v.View):
@@ -56,11 +51,9 @@ class TestingView(v.View):
             ]
 
         super().__init__(app, prevView)
-        self.tr = 0
-        self.ta = 0
+        
 
         self.streaming = False
-#         self.mode = preTest
         self.numBtnX = self.cax
         self.numBtnY = self.cay
         self.resetVectors()
@@ -70,13 +63,23 @@ class TestingView(v.View):
         self.tests = 0
         
         self.startGraph()
+
         self.lastDataT = t.time()
         self.dataInt = 0.1
         self.inVals = 0
+        self.tr = 0
+        self.ta = 0
+        
         self.initPreTestInfoLayout()
-        self.inPrRect = rl.RectLabel(self.app,
-                                     {'x':self.cax, 'y':self.cay, 'xdim':70*d.px, 'ydim': 70*d.py},
-                                     {'txt': 'TESTING IN PROGRESS', 'txtDim': 6*d.px, 'color': d.light_green})
+        
+        self.inPrRect = rl.RectLabel(app = self.app,
+                                     pos = (self.cax,  self.cay),
+                                     dim = (70*d.px, 70*d.py),
+                                     text = 'TESTING IN PROGRESS',
+                                     font = self.app.viewTtlFont,
+                                     fontCol = self.app.viewTtlFont,
+                                     bcgCol = d.light_green
+                                     )
         self.makeConfirmMsgs()
         
 
@@ -84,41 +87,60 @@ class TestingView(v.View):
         self.setItemFocusNum(0)
         self.setPostItemFocusNum(0)
         self.cols = [self.cax - 20*d.px, self.cax + 20*d.px]
-        self.stnBtnDefs = (
-            {'label': 'FOLDER', 'value': self.app.getSetting(d.TEST_FOLDER),'funct': self.toTestFolderSetting},
-            {'label': 'PLOT #', 'value': self.app.getSetting(d.TEST_PLOT),'funct': self.toPlotSetting},
-            {'label': 'HEIGHT', 'value': self.app.getSetting(d.TEST_HEIGHT), 'funct': self.toHeightSetting}
-        )
-        self.postStnBtnDefs = (
-            {'label': 'Load', 'value': 'F','funct': self.switchLoadMode},
-            {'label': 'Rot.', 'value': 'IMU','funct': self.switchRotMode}
-        )
-
-        self.nlDefs = (
-            {'funct': self.toNoteSetting},
-            {'funct': self.toPlotSetting}
-        )
+        
         self.items = []
         self.postItems = []
 
-        self.items.append(self.SettingBtn(self.app, {'x': self.cols[0], 'y': self.cay - 20 * d.py + 20 * 0 * d.py},
-                                          self.stnBtnDefs[0], True))
+        self.items.append(vb.ViewBtn(app = self.app,
+                                    pos = (self.cols[0], self.cay - 20 * d.py + 20 * 0 * d.py),
+                                    dim = (25*d.px, 18*d.py),
+                                    label = 'FOLDER',
+                                    value = self.app.getSetting(d.TEST_FOLDER),
+                                    funct = self.toTestFolderSetting, 
+                                    focus = True
+                          )
+        
         self.items.append(self.NoteListWrapper(self.app,self.disp,{'x':self.cols[1],'y':self.cay-10*d.py, 'xdim':20*d.px, 'ydim': 15*d.py}, listName = 'postTestNotes', focus =False, metaData = {'funct': self.toNoteSetting}))
-        self.items.append(self.SettingBtn(self.app, {'x': self.cols[0], 'y': self.cay - 20 * d.py + 20 * 1 * d.py},
-                                          self.stnBtnDefs[1], False))
+        
+        self.items.append(vb.ViewBtn(app = self.app,
+                                    pos = (self.cols[0], self.cay - 20 * d.py + 20 * 1 * d.py),
+                                    dim = (25*d.px, 18*d.py),
+                                    label = 'PLOT #',
+                                    value = self.app.getSetting(d.TEST_PLOT),
+                                    funct = self.toPlotSetting,
+                                    focus = True
+                          )
         self.items.append(self.NoteListWrapper(self.app,self.disp,{'x':self.cols[1],'y':self.cay+20*d.py, 'xdim':20*d.px, 'ydim': 15*d.py}, listName = 'preTestNotes', focus =False, metaData = {'funct': self.toNoteSetting}))
-        self.items.append(self.SettingBtn(self.app, {'x': self.cols[0], 'y': self.cay - 20 * d.py + 20 * 2 * d.py},
-                                          self.stnBtnDefs[2], False))
         
+        self.items.append(vb.ViewBtn(app = self.app,
+                                    pos = (self.cols[0], self.cay - 20 * d.py + 20 * 2 * d.py),
+                                    dim = (25*d.px, 18*d.py),
+                                    label = 'HEIGHT',
+                                    value = self.app.getSetting(d.TEST_HEIGHT),
+                                    funct = self.toHeightSetting},
+                                    focus = True
+                          )
+                
         self.postItems.append(nl.NoteList(self.app, self.disp,{'x':self.cax-28*d.px,'y':self.cay, 'xdim':20*d.px, 'ydim': 25*d.py}, listName = 'postTestNotes', hasFocus = True))
-        
-        self.postItems.append(self.SettingBtn(self.app, {'x': self.cax-10*d.px, 'y': self.cay + 40 * d.py},
-                                          self.postStnBtnDefs[0], False,  (15 * d.px, 10*d.py)))
-        self.postItems.append(self.SettingBtn(self.app, {'x': self.cax+10*d.px, 'y': self.cay + 40 * d.py},
-                                  self.postStnBtnDefs[1], False, (15 * d.px, 10*d.py)))
 
-        self.postTestNote = self.PostTestNote(self.app, self.disp)
-        
+
+        self.postItems.append(vb.ViewBtn(app = self.app,
+                                    pos = (self.cax-10*d.px, self.cay + 40 * d.py),
+                                    dim = (15 * d.px, 10*d.py),
+                                    label = 'Load',
+                                    value = 'F',
+                                    funct = self.switchLoadMode},
+                                    focus = False
+                          )
+
+        self.postItems.append(vb.ViewBtn(app = self.app,
+                                    pos = (self.cax+10*d.px, self.cay + 40 * d.py),
+                                    dim = (15 * d.px, 10*d.py),
+                                    label = 'Rot.',
+                                    value = 'IMU',
+                                    funct = self.switchRotMode},
+                                    focus = False
+                          )        
         
     def makeConfirmMsgs(self):
         #test folder
@@ -230,16 +252,16 @@ class TestingView(v.View):
         
         
         
-        if os.path.exists(d.USB_TEST_FOLDERS_PATH):
+        if os.path.exists(d.USB_DATA_PATH):
             #usb is plugged in
-            if not os.path.exists(d.USB_TEST_FOLDERS_PATH + d.TEST_FOLDER_PATH):
+            if not os.path.exists(d.USB_DATA_PATH + d.TESTS_DIR):
                 #the tests folder does not exist ont he usb
-                os.makedirs(d.USB_TEST_FOLDERS_PATH + d.TEST_FOLDER_PATH)
-            TEST_FOLDERS_PATH = d.USB_TEST_FOLDERS_PATH + d.TEST_FOLDER_PATH
+                os.makedirs(d.USB_DATA_PATH + d.TESTS_DIR)
+            TEST_FOLDERS_PATH = d.USB_DATA_PATH + d.TESTS_DIR
         else:
-            if not os.path.exists(d.RASPI_TEST_FOLDERS_PATH + d.TEST_FOLDER_PATH):
-                os.makedirs(d.RASPI_TEST_FOLDERS_PATH + d.TEST_FOLDER_PATH)
-            TEST_FOLDERS_PATH = d.RASPI_TEST_FOLDERS_PATH + d.TEST_FOLDER_PATH
+            if not os.path.exists(d.RASPI_DATA_PATH + d.TESTS_DIR):
+                os.makedirs(d.RASPI_DATA_PATH + d.TESTS_DIR)
+            TEST_FOLDERS_PATH = d.RASPI_DATA_PATH + d.TESTS_DIR
                 
         fileName = self.app.getEnvData(d.TIME)
         folderPath = TEST_FOLDERS_PATH + '/' + self.app.getSetting(d.TEST_FOLDER)
@@ -275,6 +297,7 @@ class TestingView(v.View):
                 self.postItems[self.postItemFocusNum].selectCurrent()
             else:
                 self.postItems[self.postItemFocusNum].funct()
+
     def setItemFocusNum(self, num):
         self.itemFocusNum = num
 
@@ -282,18 +305,13 @@ class TestingView(v.View):
         self.items[self.itemFocusNum].setFocus(False)
         self.itemFocusNum = num
         self.items[self.itemFocusNum].setFocus(True)
+
     def setPostItemFocusNum(self, num):
         self.postItemFocusNum = num
         
     def setPostItemFocus(self, num):
-#         if self.postItemFocusNum == 0:
-#             self.noteList.setFocus(False)
-#         else:
         self.postItems[self.postItemFocusNum].setFocus(False)
         self.postItemFocusNum = num
-#         if self.postItemFocusNum == 0:
-#             self.noteList.setFocus(True)            
-#         else:
         self.postItems[self.postItemFocusNum].setFocus(True)            
 
     def edit(self):
@@ -338,6 +356,7 @@ class TestingView(v.View):
     def bringIfConfirmMsg(self):
         if not self.tests % self.app.getSetting(d.DATA_CONFIRM_FREQ):
             self.makeConfirmMsgs()
+    
     def resetVectors(self):
         self.testData = np.array([])
         self.times = np.array([])
@@ -364,8 +383,8 @@ class TestingView(v.View):
     def stopTest(self):
         #self.focusNum = 2
 #         self.stopDataIn = t.time()
-        self.app.hd.stopStream()
         self.app.streaming = False
+        self.app.hd.stopStream()
         
         self.tests += 1
         
@@ -387,6 +406,11 @@ class TestingView(v.View):
         
         
 #         self.madeUpData()
+        print('self.anglePots', len(self.anglePots))
+        print('self.angleImus', len(self.angleImus))
+        print('self.loadsX', len(self.loadsX))
+        print('self.loadsY', len(self.loadsY))
+        print('self.times', len(self.times))
         
         self.redrawGraph()
     def madeUpData(self):
@@ -473,8 +497,6 @@ class TestingView(v.View):
                 highlights = highlights,
                 annotations = annotations                                              
             )
-    def getTrueMaxLoad(self):
-        return 
     def switchLoadMode(self):
         self.drawXY = not self.drawXY
         self.postItems[1].setValue('XY' if self.drawXY else 'F')
@@ -491,8 +513,6 @@ class TestingView(v.View):
         self.drop()
     def drop(self):
         self.resetVectors()
-#         self.graph.resetPlot()
-        # self.graph.updatePlotImg(np.array([]))
         self.focusNum = preTest
         self.initButArea()
         self.bringIfConfirmMsg()
@@ -505,7 +525,6 @@ class TestingView(v.View):
         self.app.setView(self.prevView)
 
     def simulateDataIn(self):
-        #if (t.time() -self.lastDataT >= self.dataInt):
         self.fullStreamDataIn(ri(0,100), ri(0,200), ri(0,100), ri(0,100), ri(0,100))
         self.lastDataT = t.time()
     def startGraph(self):
@@ -526,64 +545,33 @@ class TestingView(v.View):
         if self.focusNum == preTest:
             if (self.itemFocusNum>=2):
                 self.setItemFocus(self.itemFocusNum-2)
-#                 self.items[self.itemFocusNum].setFocus(False)
-#                 self.itemFocusNum-=2
-#                 self.items[self.itemFocusNum].setFocus(True)
         elif self.focusNum == postTest:
             self.postItems[self.postItemFocusNum].upArrowPress()
-#             if self.noteList.hasFocus:
-#                 self.noteList.upArrowPress()
     def downArrowPress(self):
         if self.focusNum == preTest:
             if (self.itemFocusNum<len(self.items)-2):
                 self.setItemFocus(self.itemFocusNum+2)
-#                 self.items[self.itemFocusNum].setFocus(False)
-#                 self.itemFocusNum+=2
-#                 self.items[self.itemFocusNum].setFocus(True)
         elif self.focusNum == postTest:
             self.postItems[self.postItemFocusNum].downArrowPress()
             
-#             if self.noteList.hasFocus:
-#                 self.noteList.downArrowPress()
     def leftArrowPress(self):
         if self.focusNum == preTest:
             if (self.itemFocusNum>0):
                 self.setItemFocus(self.itemFocusNum-1)
-
-#                 self.items[self.itemFocusNum].setFocus(False)
-#                 self.itemFocusNum-=1
-#                 self.items[self.itemFocusNum].setFocus(True)
         elif self.focusNum == postTest:
             self.setPostItemFocus((self.postItemFocusNum-1)%3)
-            #self.postTestNote.leftArrowPress()
-#             self.drawPots = not self.drawPots
-#             self.redrawGraph()
             pass
 
     def rightArrowPress(self):
         if self.focusNum == preTest:
             if (self.itemFocusNum<len(self.items)-1):
                 self.setItemFocus(self.itemFocusNum+1)                
-#                 self.items[self.itemFocusNum].setFocus(False)
-#                 self.itemFocusNum+=1
-#                 self.items[self.itemFocusNum].setFocus(True)
             else:
                 self.leftArrowPress()
-#             self.graph.rightArrowPress()
         elif self.focusNum == postTest:
             self.setPostItemFocus((self.postItemFocusNum+1)%3)
-            #self.postTestNote.rightArrowPress()
-#             self.drawPots = not self.drawPots
-#             self.redrawGraph()
             pass
-    # def timeIn(self, value):
-    #     pass
-    # def locationIn(self, x, y):
-    #     pass
-#     def temperatureIn(self, value):
-#         pass
-#     def humidityIn(self, value):
-#         pass
+
     def anglePotIn(self, value):
         if self.app.streaming:
             self.anglePots = np.append(self.anglePots, float(value))
@@ -630,49 +618,48 @@ class TestingView(v.View):
     def focusOn(self):
         self.initPreTestInfoLayout()
         super().focusOn()
-    class SettingBtn:
-        def __init__(self, app,geoData, metaData, focus, dim = (25*d.px, 18*d.py)):
-            self.app = app
-            self.disp = self.app.disp
-            self.x = geoData['x']
-            self.y = geoData['y']
-            self.xdim = dim[0]
-            self.ydim = dim[1]
-            self.label = metaData['label']
-            self.value = metaData['value']
-            self.funct = metaData['funct']
-            self.setFocus(focus)
-            self.txtDim = txt.findFontSize(self.label+ ': ' + str(self.value), 'Arial', self.xdim, self.ydim)
-
-            self.setFontCol()
-
-            self.setFont()
-
-            self.setTxt()
-        def setValue(self, value):
-            self.value = value
-        def setFocus(self, focus):
-            self.focus = focus
-            self.setBcgCol()
-
-        def setTxt(self):
-            self.txt = self.font.render(self.label+ ': ' + str(self.value) + ('mm' if self.label == 'Height' else ''), True, self.fontCol)
-        def setFont(self):
-            self.font = pg.font.SysFont('Arial', self.txtDim, bold = True)
-        def setBcgCol(self):
-            self.bcgCol = d.textView_highlight_col if self.focus else self.app.textView_col
-        def setFontCol(self):
-            self.fontCol = self.app.font_col
-
-        def display(self):
-            # display rect
-            pg.draw.rect(self.disp, self.bcgCol, (self.x - self.xdim / 2, self.y - self.ydim / 2, self.xdim, self.ydim))
-            #display number
-            self.disp.blit(self.txt, (self.txt.get_rect(center=(self.x, self.y))))
-        def upArrowPress(self):
-            pass
-        def downArrowPress(self):
-            pass
+        
+#     class SettingBtn:
+#         def __init__(self, app,geoData, metaData, focus, dim = (25*d.px, 18*d.py)):
+#             self.app = app
+#             self.disp = self.app.disp
+#             self.x = geoData['x']
+#             self.y = geoData['y']
+#             self.xdim = dim[0]
+#             self.ydim = dim[1]
+#             self.label = metaData['label']
+#             self.value = metaData['value']
+#             self.funct = metaData['funct']
+#             
+#             self.rl = rl.RectLabel(self.app,
+#                                    (self.x, self.y),
+#                                    (self.xdim, self.ydim),
+#                                    self.getLabel(),
+#                                    self.app.stnBtnFont,
+#                                    self.app.font_col,
+#                                    self.self.bcgCol
+#                                    )
+#             
+#             
+#             self.setFocus(focus)
+# 
+#         def setValue(self, value):
+#             self.value = value
+#             self.rl.setText(self.getLabel())
+#         def setFocus(self, focus):
+#             self.focus = focus
+#             self.setBcgCol()
+#         def getLabel(self):
+#             return self.label+ ': ' + str(self.value) + ('mm' if self.label == 'Height' else '')
+#         def setBcgCol(self):
+#             self.bcgCol = d.textView_highlight_col if self.focus else self.app.textView_col
+#             self.rl.setBcgCol(self.bcgCol)
+#         def display(self):
+#             self.rl.display()
+#         def upArrowPress(self):
+#             pass
+#         def downArrowPress(self):
+#             pass
     class NoteListWrapper:
         def __init__(self, app, disp, geoData, list = None, listName='', focus= False, metaData={}):
             self.app = app
@@ -697,36 +684,3 @@ class TestingView(v.View):
         def display(self):
             pg.draw.rect(self.disp, self.bcgCol, (self.x - self.xdim / 2, self.y - self.ydim / 2, self.xdim, self.ydim))
             self.nl.display()
-    class PostTestNote:
-        def __init__(self, app, disp):
-            self.app = app
-            self. disp = disp
-            if len(self.app.getSetting(d.POST_TEST_NOTES))==0:
-                self.isEmpty = True
-            else:
-                self.isEmpty = False
-                self.setNotes(self.app.getSetting(d.POST_TEST_NOTES))
-
-        def setNotes(self, notes):
-            self.postTestNotes = notes
-            self.focusNum = 0
-            self.noteLabel = rl.RectLabel(self.app,
-                                          {'x': 62.5*d.px, 'y': 90*d.py, 'xdim': 25*d.px, 'ydim': 15*d.py},
-                                          {'txt': self.postTestNotes[self.focusNum], 'txtDim': 4*d.px, 'color': d.light_blue})
-        def getNote(self):
-            if self.isEmpty:
-                return ''
-            return self.postTestNotes[self.focusNum]
-        def leftArrowPress(self):
-            if not self.isEmpty:
-                if self.focusNum > 0:
-                    self.focusNum -=1
-                    self.noteLabel.setTxt(self.postTestNotes[self.focusNum])
-        def rightArrowPress(self):
-            if not self.isEmpty:
-                if self.focusNum < len(self.postTestNotes)-1:
-                    self.focusNum +=1
-                    self.noteLabel.setTxt(self.postTestNotes[self.focusNum])
-        def display(self):
-            if not self.isEmpty:
-                self.noteLabel.display()

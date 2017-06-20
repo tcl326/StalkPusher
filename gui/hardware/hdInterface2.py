@@ -155,7 +155,7 @@ class HardWare:
                     ack_comm = re.findall(ACK_COMM, ard_input)[0]
                     self.parseAck(ack_comm)
                 elif re.match(DATA_IN_COMM, ard_input) != None:
-                    print('DATA IN: |' + ard_input + '|')
+#                     print('DATA IN: |' + ard_input + '|')
                      
                     if self.app.view is not None:
                         self.parseData(ard_input)
@@ -163,7 +163,7 @@ class HardWare:
                         if not self.isConnected():
                             self.connectionConfirmed()
                 else:
-                    print('NOT DATA IN: |' + ard_input + '|')
+#                     print('NOT DATA IN: |' + ard_input + '|')
                     pass
                 #t.sleep(0.01)
 #             print('4a')

@@ -23,7 +23,7 @@ class LiveFeedView(v.View):
                 {'label': 'BACK', 'id': 'bckbtn', 'funct': self.back},
             ),
             (
-                {'label': 'STOP-START', 'id': 'bckbtn', 'funct': self.uPause},
+                {'label': 'STOP/\nSTART', 'id': 'bckbtn', 'funct': self.uPause},
                 {'label': 'UNITS', 'id': 'bckbtn', 'funct': self.toReal},
                 {},
                 {'label': 'BACK', 'id': 'bckbtn', 'funct': self.back}
@@ -243,7 +243,7 @@ class LiveFeedView(v.View):
         def setBcgCol(self):
             self.bcgCol = d.textView_highlight_col if self.focus else self.app.textView_col
         def setFontCol(self):
-            self.fontCol = d.black
+            self.fontCol = self.app.font_col
 
         def display(self):
             # display rect

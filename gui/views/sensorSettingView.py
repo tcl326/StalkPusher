@@ -10,7 +10,7 @@ class SensorSettingView(v.View):
         self.title = 'SENSORS MANAGER'
         self.btnDefs = [
                 (
-                    {'label': 'ADD SENSOR', 'id': 'addSensorBtn', 'funct': self.addSensor},
+                    {'label': 'ADD\nSENSOR', 'id': 'addSensorBtn', 'funct': self.addSensor},
                     {},
                     {},
                     {'label': 'BACK', 'id': 'bckBtn', 'funct': self.goBack}

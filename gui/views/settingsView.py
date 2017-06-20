@@ -5,6 +5,8 @@ import pygame as pg
 import defs as d
 from views import view as v
 from utils import text as txt
+from items import message as msg
+import os
 class SettingsView(v.View):
     def __init__(self, app, prevView = None):
         self.btnDefs = [(
@@ -21,10 +23,10 @@ class SettingsView(v.View):
             {'label': 'PLOT', 'funct': self.toPlotSetting},
             {'label': 'NOTE', 'funct': self.toNoteSetting},
             {'label': 'COLORS', 'funct': self.toColorTesting},
-            {'label': 'SENSORS', 'funct': self.toSensorSettingView}
+            {'label': 'SENSORS', 'funct': self.toSensorSettingView},
 #             {'label': 'VOLUME', 'funct': self.toPendingSetting},
 #             {'label': 'GPS', 'funct': self.toPendingSetting},
-#             {'label': 'UPDATE', 'funct': self.toPendingSetting},
+            {'label': 'UPDATE', 'funct': self.checkUSB},
 #             {'label': 'ABOUT', 'funct': self.toPendingSetting},
         )
         self.numStnBtnRow = 2
@@ -68,10 +70,10 @@ class SettingsView(v.View):
         from views import sensorSettingView as ssv
         self.app.setView(ssv.SensorSettingView(self.app, self))
         
-    def toCalibrationChoiceView  (self):
-        from views import calibrationChoiceView as ccv
-        self.app.setView(ccv.CalibrationChoiceView(self.app, self))
-       
+    def toUpdateSetting(self):
+        from views import updateView as uv
+        self.app.setView(uv.UpdateView(self.app, self))
+               
     def toPendingSetting(self):
         pass
     def back(self):
@@ -114,7 +116,7 @@ class SettingsView(v.View):
             self.label = metaData['label']
             self.funct = metaData['funct']
             self.setFocus(focus)
-            self.txtDim = txt.findFontSize(self.label, 'Arial', self.xdim, self.ydim, 4*d.px)#int(4*d.px)
+            self.txtDim = int(3.8*d.px)
             self.setBcgCol()
 
             self.setFontCol()
@@ -141,3 +143,86 @@ class SettingsView(v.View):
             pg.draw.rect(self.disp, self.bcgCol, (self.x - self.xdim / 2, self.y - self.ydim / 2, self.xdim, self.ydim))
             #display number
             self.disp.blit(self.txt, (self.txt.get_rect(center=(self.x, self.y))))
+
+    """
+    Update SUB Stick structure
+    /
+        /update
+            updateData.json
+            /cropDevice
+                /main
+                /utils
+                /views
+                /...
+    updateConf.json contains following info:
+    - new version
+    - replace appData.json?
+    - etc.
+    """
+    def checkUSB(self):
+        validUpdate = False
+        updatePath = d.USB_DATA_PATH+d.UPDATE_DIR
+        print('u[date path: ', updatePath)
+        print('checking if update path exists')
+
+        if os.path.exists(updatePath):
+            updateDataPath = os.path.join(updatePath, 'updateData.json')
+            print('u[date data path: ', updateDataPath)
+            print('update path exists')
+            if os.path.isfile(updateDataPath):
+                updateData = d.readSettingFromFile(updateDataPath)
+                newVersion = updateData['version']
+                validUpdate = True
+                print('update data exists')
+
+        if validUpdate:
+            self.pushMsg(msg.Message(self.app, self, self.disp,
+                                        'Valid update found.',
+                                        'Current version: ' + self.app.getSetting(d.VERSION) + ' New version: ' + newVersion,
+                                        btnDefs = (
+                                            {'label': 'UPDATE', 'id': 'yesBtn', 'funct': (self.popMsg, self.updateSoftware)},
+                                            {},
+                                            {},
+                                            {'label': 'CANCEL', 'id': 'yesBtn', 'funct': self.popMsg}
+                                        )
+                                        )
+                             )
+        else:
+            #either no USB stick or incorrect folder structure
+            self.pushMsg(msg.Message(self.app, self, self.disp,
+                                        'No valid update.',
+                                        'Insert USB stick with valid update',
+                                        btnDefs = (
+                                            {'label': 'RETRY', 'id': 'yesBtn', 'funct': (self.popMsg, self.checkUSB)},
+                                            {},
+                                            {},
+                                            {'label': 'CANCEL', 'id': 'yesBtn', 'funct': self.popMsg}
+                                        )
+                                        )
+                             )
+            
+    def updateSoftware(self):
+        import subprocess
+        updatePath = d.USB_DATA_PATH+d.UPDATE_DIR
+        newSoftwarePath = os.path.join(updatePath, 'cropDevice')
+        sampleFilePath = os.path.join(newSoftwarePath, 'sampleFile.txt')
+        
+        command = 'sudo cp ' + sampleFilePath + ' ' + d.MAINAPP_PATH
+        process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        output = process.communicate()[0]
+        
+        self.pushMsg(msg.Message(self.app, self, self.disp,
+                                    'Update succesful.',
+                                    'Restart device to apply changes.',
+                                    btnDefs = (
+                                        {'label': 'RESTART', 'id': 'yesBtn', 'funct': (self.popMsg, self.app.restartPi)},
+                                        {},
+                                        {},
+                                        {'label': 'LATER', 'id': 'yesBtn', 'funct': self.popMsg}
+                                    )
+                                    )
+                         )
+        
+        
+        
+

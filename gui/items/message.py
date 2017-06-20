@@ -32,7 +32,7 @@ class Message:
         self.msg = rl.RectLabel(self.app,
                                 {'x':self.x, 'y': self.y, 'xdim': 70*d.px, 'ydim': 10*d.py},
                                 {'txt':self.msgTxt,'txtDim':2.5*d.px,'color':self.app.textView_col})
-        self.font = pg.font.SysFont('Arial', 18)
+        self.font = pg.font.SysFont('Arial', int(4*d.px))
         self.initButArea()
     def initButArea(self):
         self.view.initButAreaByDefs(self.btnDefs)
@@ -43,6 +43,13 @@ class Message:
         #display title
         self.ttl.display()
         #display message
-        txt.multilineText(self.disp, self.msgTxt, [self.x-self.xdim/2, self.y-self.ydim/2],[self.xdim, self.ydim], self.font, self.app.font_col)
+        w = 0.9*self.xdim
+        left = self.x-w/2
+        
+        boxH = (self.ydim - self.ttl.ydim)
+        h = 0.9*(boxH)
+        top = self.y-self.ydim/2 + self.ttl.ydim + (boxH-h)/2
+#         txt.multilineText(self.disp, self.msgTxt, (left, top),(w, h), self.font, self.app.font_col)
+        txt.multilineText2(self.disp, self.msgTxt, (left, top),(w, h), self.font, self.app.font_col)
 #         self.msg.display()
         

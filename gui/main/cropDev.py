@@ -13,6 +13,8 @@ from views import liveFeedView as lfv
 import time as t
 import threading as thr
 import sys
+import os
+
 
 class CropDevMain:
     def __init__(self):
@@ -48,15 +50,26 @@ class CropDevMain:
         self.clock = pg.time.Clock()
 #         self.bcgCol = list(d.bcg_col)
         self.blitScreen = True
+        self.createFonts()
         self.createViews()
         
         self.setView(self.mainView)
         self.view.getAll()
         self.btnInput.resetBtnPresses()
         self.running = True
+    def createFonts(self):
+        self.btnFont = pg.font.SysFont('Arial', d.BTN_FS, True)
+        self.viewTtlFont = pg.font.SysFont('Arial', d.VIEW_TTL_FS, True)
+        self.nlFont = pg.font.SysFont('Arial', d.NL_FS, True)
+        self.stnBtnFont = pg.font.SysFont('Arial', d.STN_BTN_FS, True)
+        self.msgTtlFont = pg.font.SysFont('Arial', d.MSG_TTL_FS, True)
+        self.msgBdFont = pg.font.SysFont('Arial', d.MSG_BD_FS, True)
+        self.kbKeyFont = pg.font.SysFont('Arial', d.KB_KEY_FS, True)
+        self.numKeyFont = pg.font.SysFont('Arial', d.NK_FS, True)
+        
     def updateScreen(self):
 #         if not self.blitScreen:
-        print('update screen')
+#         print('update screen')
         self.blitScreen = True       
     def createViews(self):
 
@@ -107,8 +120,6 @@ class CropDevMain:
             return 'NA'
     def saveEnvData(self, type, value):
         self.envData[type] = value
-    def exit(self):
-        self.running = False
 
     def loop(self):
         while self.running:
@@ -140,13 +151,13 @@ class CropDevMain:
                 if event.type == pg.QUIT:
                     self.exit()
             if self.blitScreen:
-                print('display.update() start')
+#                 print('display.update() start')
 
                 self.disp.fill(self.bcg_col)
                 self.view.display()
                 pg.display.update()
                 self.blitScreen = False
-                print('display.update() end')
+#                 print('display.update() end')
 
             self.clock.tick(60)
             ##########################   TO BE UNCOMMENTED
@@ -210,6 +221,28 @@ class CropDevMain:
     def rightArrowPress(self):
         print('RIGHT')
         self.view.rightArrowPress()
+    
+    
+    def exit(self):
+        self.running = False
+#         import subprocess
+#         command = "sudo python3 /home/pi/Desktop/StalkPusher/gui/main/cropDev.py &"
+#         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+#         
+#         output = process.communicate()[0]
+#         quit()
+#        
+# 
+#         print(output)
+        
+    def restartSoftware(self):
+        """Restarts the current program.
+        Note: this function does not return. Any cleanup action (like
+        saving data) must be done before calling this function."""
+        python = sys.executable
+        os.execl(python, python, * sys.argv)
+
+
     def restartPi(self):
         command = "/usr/bin/sudo /sbin/shutdown -r now"
         import subprocess

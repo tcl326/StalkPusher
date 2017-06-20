@@ -26,10 +26,10 @@ class PastTestsView(v.View):
 
         self.folderList = []
         
-        if os.path.exists(d.USB_TEST_FOLDERS_PATH+d.TEST_FOLDER_PATH):
-            self.testsPath = d.USB_TEST_FOLDERS_PATH+d.TEST_FOLDER_PATH
+        if os.path.exists(d.USB_DATA_PATH+d.TESTS_DIR):
+            self.testsPath = d.USB_DATA_PATH+d.TESTS_DIR
         else:
-            self.testsPath = d.RASPI_TEST_FOLDERS_PATH+d.TEST_FOLDER_PATH
+            self.testsPath = d.RASPI_DATA_PATH+d.TESTS_DIR
         l = self.getAllFolders()      
         self.folderList.append(nl.NoteList(self.app, self.disp,{'x':self.cax-23*d.px,'y':self.cay, 'xdim':28*d.px, 'ydim': 50*d.py}, l,'Test folders', True))
         

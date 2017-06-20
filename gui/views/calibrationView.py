@@ -17,8 +17,8 @@ class CalibrationView(v.View):
         self.btnDefs = [
                 (
                     {'label': 'SAVE', 'id': 'saveBtn', 'funct': self.save},
-                    {'label': 'NEW VALUE', 'id': 'newValBtn', 'funct': self.newValue},
-                    {'label': 'ADD POINT', 'id': 'addPointBtn', 'funct': self.addPoint},
+                    {'label': 'NEW\nVALUE', 'id': 'newValBtn', 'funct': self.newValue},
+                    {'label': 'ADD\nPOINT', 'id': 'addPointBtn', 'funct': self.addPoint},
                     {'label': 'CANCEL', 'id': 'cancelBtn', 'funct': self.cancel}
                 )
             ]
