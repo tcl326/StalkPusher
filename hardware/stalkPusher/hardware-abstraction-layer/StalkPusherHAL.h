@@ -15,7 +15,8 @@ class StalkPStalkPusherHAL
     void getTemperature();
     void getHumidity();
     void getIMUAngle();
-    void 
+    void getLocation();
+    void get
   private:
     int _pin;
 };

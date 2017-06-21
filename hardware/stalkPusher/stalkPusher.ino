@@ -1,10 +1,10 @@
-#include <SFE_LSM9DS0.h>
-#include <ADS1115.h>
+#include "ADS1115.h"
+#include "SFE_LSM9DS0.h"
+#include "Adafruit_GPS.h"
 
-#include <Adafruit_GPS.h>
 #include <SoftwareSerial.h>
 #include <Wire.h>
-#include <Adafruit_AM2315.h>
+#include "Adafruit_AM2315.h"
 //#include <Adafruit_ADS1015.h>
 //#include <Adafruit_LSM9DS0.h>
 //#include <Adafruit_Sensor.h>
