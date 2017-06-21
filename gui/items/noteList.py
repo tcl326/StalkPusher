@@ -55,17 +55,25 @@ class NoteList():
 #          return cls(app, disp, geoData, list, hasFocus)
     
     def addTtlRect(self):
-        self.ttlRect = rl.RectLabel(
-            self.app,
-            {'x':self.x,
-             'y':self.y-self.ydim /2 - 8*d.py,
-             'xdim': self.xdim,
-             'ydim': self.noteHeight},
-            {'txt':self.listName,
-             'txtDim': 3*d.px,
-             'color': d.transparent
-             }, d.font_col_inv
-            )
+        self.ttlRect = rl.RectLabel(app=self.app,
+                                    pos = (self.x, self.y-self.ydim /2 - 8*d.py),
+                                    dim = (self.xdim, self.noteHeight),
+                                    text = self.listName,
+                                    font = self.app.nlFont,
+                                    fontCol = d.invertColor(self.app.bcg_col),
+                                    bcgCol = d.transparent
+                                    )
+#         self.ttlRect = rl.RectLabel(
+#             self.app,
+#             {'x':self.x,
+#              'y':self.y-self.ydim /2 - 8*d.py,
+#              'xdim': self.xdim,
+#              'ydim': self.noteHeight},
+#             {'txt':self.listName,
+#              'txtDim': 3*d.px,
+#              'color': d.transparent
+#              }, d.font_col_inv
+#             )
 #         self.ttlRect.setFontCol(d.font_col_inv)
     def getItem(self):
         return self.list[0] if len(self.list) ==1 else self.list[self.focusNum]
@@ -99,13 +107,28 @@ class NoteList():
 
         self.startIndex = 0
         self.endIndex = min(len(self.yNoteCents)-1, len(self.list)-1)
-        self.itemsAvUplbl = rl.RectLabel(self.app,
-                                         {'x': self.x, 'y': self.yNoteCents[0]- self.noteHeight - self.interNoteSpace, 'xdim': self.xdim,'ydim': self.noteHeight},
-                                         {'txt': '...', 'txtDim': 4*d.px, 'color': self.app.textView_col})
+        
+        self.itemsAvUplbl = rl.RectLabel(app = self.app,
+                                         pos = (self.x, self.y),
+                                         dim = (self.xdim, self.noteHeight),
+                                         text = '...',
+                                         font = self.app.nlFont
+                                         )
+#         self.itemsAvUplbl = rl.RectLabel(self.app,
+#                                          {'x': self.x, 'y': self.yNoteCents[0]- self.noteHeight - self.interNoteSpace, 'xdim': self.xdim,'ydim': self.noteHeight},
+#                                          {'txt': '...', 'txtDim': 4*d.px, 'color': self.app.textView_col})
 
-        self.itemsAvDownlbl = rl.RectLabel(self.app,
-                                         {'x': self.x, 'y': self.yNoteCents[-1]+ self.noteHeight+ self.interNoteSpace, 'xdim': self.xdim,'ydim': self.noteHeight},
-                                         {'txt': '...', 'txtDim': 4*d.px, 'color': self.app.textView_col})
+        self.itemsAvDownlbl = rl.RectLabel(app = self.app,
+                                         pos = (self.x, self.yNoteCents[-1]+ self.noteHeight+ self.interNoteSpace),
+                                         dim = (self.xdim, self.noteHeight),
+                                         text = '...',
+                                         font = self.app.nlFont
+                                         )
+
+#         self.itemsAvDownlbl = rl.RectLabel(self.app,
+#                                          {'x': self.x, 'y': self.yNoteCents[-1]+ self.noteHeight+ self.interNoteSpace, 'xdim': self.xdim,'ydim': self.noteHeight},
+#                                          {'txt': '...', 'txtDim': 4*d.px, 'color': self.app.textView_col})
+        
 
     def setFocusNum(self, focusNum):#focusNum operates on self.list (and hence self.notes)
 #         if self.hasFocus:
@@ -122,13 +145,13 @@ class NoteList():
                                         {'x': self.x,'y': self.y,'xdim': self.xdim,'ydim': self.noteHeight},
                                         {'txt':self.list[i], 'txtDim': 3*d.px},
                                         self.focusNum == i and self.hasFocus))
-        self.itemsAvDownlbl.setTxt('+'+str(len(self.list)-self.endIndex-1)+'...')
+        self.itemsAvDownlbl.setText('+'+str(len(self.list)-self.endIndex-1)+'...')
 
     def printInfo(self):
         print('yNoteCents:',len(self.yNoteCents),'start:',self.startIndex, 'end:', self.endIndex, 'focusNum:', self.focusNum)
     def reSetItemsAv(self):
-        self.itemsAvUplbl.setTxt('+'+str(self.startIndex)+'...')           
-        self.itemsAvDownlbl.setTxt('+'+str(len(self.list)-self.endIndex-1)+'...')
+        self.itemsAvUplbl.setText('+'+str(self.startIndex)+'...')           
+        self.itemsAvDownlbl.setText('+'+str(len(self.list)-self.endIndex-1)+'...')
         
     def prependNote(self, noteContent):
         self.list.insert(0, noteContent)
@@ -167,8 +190,8 @@ class NoteList():
         self.endIndex = min(len(self.list)-self.startIndex-1, len(self.list)-1)
         
         self.setFocusNum(self.startIndex)
-        self.itemsAvUplbl.setTxt('+'+str(self.startIndex)+'...')           
-        self.itemsAvDownlbl.setTxt('+'+str(len(self.list)-self.endIndex-1)+'...')
+        self.itemsAvUplbl.setText('+'+str(self.startIndex)+'...')           
+        self.itemsAvDownlbl.setText('+'+str(len(self.list)-self.endIndex-1)+'...')
         self.app.updateScreen()
 
     def appendNote(self, noteContent):
@@ -295,7 +318,15 @@ class NoteList():
             self.label = txtData['txt']
             self.txtDim = txtData['txtDim']
             txtData['color'] = self.app.font_col#d.light_blue if self.focus else d.light_gray
-            self.rectLabel = rl.RectLabel(self.app, geoData, txtData, wrap = 'single-inline')
+            
+            self.rectLabel = rl.RectLabel(app = self.app,
+                                             pos = (self.x, self.y),
+                                             dim = (self.xdim, self.ydim),
+                                             text = self.label,
+                                             font = self.app.nlFont
+                                             )
+
+#             self.rectLabel = rl.RectLabel(self.app, geoData, txtData, wrap = 'single-inline')
             
             self.focus = focus
             # self.rectLabel.setBcgCol(d.light_blue if self.focus else d.light_gray)

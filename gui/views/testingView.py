@@ -21,6 +21,7 @@ from utils import text as txt
 from views import keyboardView as kbv
 from items import message as msg
 from utils import postProcess as pp
+from items import viewBtn as vb
 preTest = 0
 inTest = 1
 postTest = 2
@@ -77,9 +78,9 @@ class TestingView(v.View):
                                      dim = (70*d.px, 70*d.py),
                                      text = 'TESTING IN PROGRESS',
                                      font = self.app.viewTtlFont,
-                                     fontCol = self.app.viewTtlFont,
+                                     fontCol = self.app.font_col,
                                      bcgCol = d.light_green
-                                     )
+                                     )#in progress rectangle
         self.makeConfirmMsgs()
         
 
@@ -97,7 +98,9 @@ class TestingView(v.View):
                                     label = 'FOLDER',
                                     value = self.app.getSetting(d.TEST_FOLDER),
                                     funct = self.toTestFolderSetting, 
-                                    focus = True
+                                    focus = True,
+                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    )
                           )
         
         self.items.append(self.NoteListWrapper(self.app,self.disp,{'x':self.cols[1],'y':self.cay-10*d.py, 'xdim':20*d.px, 'ydim': 15*d.py}, listName = 'postTestNotes', focus =False, metaData = {'funct': self.toNoteSetting}))
@@ -108,7 +111,9 @@ class TestingView(v.View):
                                     label = 'PLOT #',
                                     value = self.app.getSetting(d.TEST_PLOT),
                                     funct = self.toPlotSetting,
-                                    focus = True
+                                    focus = True,
+                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    )
                           )
         self.items.append(self.NoteListWrapper(self.app,self.disp,{'x':self.cols[1],'y':self.cay+20*d.py, 'xdim':20*d.px, 'ydim': 15*d.py}, listName = 'preTestNotes', focus =False, metaData = {'funct': self.toNoteSetting}))
         
@@ -117,8 +122,10 @@ class TestingView(v.View):
                                     dim = (25*d.px, 18*d.py),
                                     label = 'HEIGHT',
                                     value = self.app.getSetting(d.TEST_HEIGHT),
-                                    funct = self.toHeightSetting},
-                                    focus = True
+                                    funct = self.toHeightSetting,
+                                    focus = True,
+                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    )
                           )
                 
         self.postItems.append(nl.NoteList(self.app, self.disp,{'x':self.cax-28*d.px,'y':self.cay, 'xdim':20*d.px, 'ydim': 25*d.py}, listName = 'postTestNotes', hasFocus = True))
@@ -129,8 +136,10 @@ class TestingView(v.View):
                                     dim = (15 * d.px, 10*d.py),
                                     label = 'Load',
                                     value = 'F',
-                                    funct = self.switchLoadMode},
-                                    focus = False
+                                    funct = self.switchLoadMode,
+                                    focus = False,
+                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    )
                           )
 
         self.postItems.append(vb.ViewBtn(app = self.app,
@@ -138,9 +147,11 @@ class TestingView(v.View):
                                     dim = (15 * d.px, 10*d.py),
                                     label = 'Rot.',
                                     value = 'IMU',
-                                    funct = self.switchRotMode},
-                                    focus = False
-                          )        
+                                    funct = self.switchRotMode,
+                                    focus = False,
+                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    )
+                          )
         
     def makeConfirmMsgs(self):
         #test folder
@@ -391,6 +402,36 @@ class TestingView(v.View):
         self.focusNum = postTest
 #         self.app.hd.getAll()
         self.initButArea()
+        
+        print('PRE TRUNCATE')
+        print('self.anglePots', len(self.anglePots))
+        print('self.angleImus', len(self.angleImus))
+        print('self.loadsX', len(self.loadsX))
+        print('self.loadsY', len(self.loadsY))
+        print('self.times', len(self.times))
+        
+        
+        #truncate data
+        min_len = min(len(self.anglePots), len(self.angleImus), len(self.loadsX), len(self.loadsY), len(self.times))
+        trunc = lambda a,i: a[0:i] if len(a) > i else a
+
+
+        self.loadsX = trunc(self.loadsX, min_len)
+        self.loadsY = trunc(self.loadsY, min_len)
+        self.anglePots = trunc(self.anglePots, min_len)
+        self.angleImus = trunc(self.angleImus, min_len)
+        self.times = trunc(self.times, min_len)
+        
+        print('POST TRUNCATE')
+        print('self.anglePots', len(self.anglePots))
+        print('self.angleImus', len(self.angleImus))
+        print('self.loadsX', len(self.loadsX))
+        print('self.loadsY', len(self.loadsY))
+        print('self.times', len(self.times))
+
+
+        
+        
         if self.times.size > 0:
             self.times -= self.times[0]
         
@@ -406,12 +447,9 @@ class TestingView(v.View):
         
         
 #         self.madeUpData()
-        print('self.anglePots', len(self.anglePots))
-        print('self.angleImus', len(self.angleImus))
-        print('self.loadsX', len(self.loadsX))
-        print('self.loadsY', len(self.loadsY))
-        print('self.times', len(self.times))
-        
+                      
+                      
+                      
         self.redrawGraph()
     def madeUpData(self):
         self.anglePots = np.arange(6, 26, 1)
@@ -424,11 +462,14 @@ class TestingView(v.View):
         self.loads = self.loadsX##np.sqrt(self.loadsX**2 + self.loadsY**2)
 
     def redrawGraph(self, highlights = np.array([]), annotations = []):
+        print('redrawing')
+        if not len(self.times):
+            print('clearing')
+            self.graph.clear()
+            print('returnng')
+            return
                         
         with self.app.hd.threadLock:
-            if not len(self.times):
-                self.graph.clear()
-                return
             
             if self.drawPots:
                 angleUnit = ' (POT.)' + '[' + ((self.getABUnit(d.DS_POT))[-1])+']'
@@ -509,6 +550,19 @@ class TestingView(v.View):
         self.redrawGraph()
     
     def save(self):
+        if not len(self.times):
+            self.pushMsg(msg.Message(self.app, self, self.disp,
+                                        'Unable to save.',
+                                        'No data or corrupted data. Check Serial Connection and retry.',
+                                        btnDefs = (
+                                            {'label': 'OK', 'id': 'yesBtn', 'funct': self.popMsg},
+                                            {},
+                                            {},
+                                            {}
+                                        )
+                                        )
+                             )
+            return
         self.saveTest()
         self.drop()
     def drop(self):
@@ -575,34 +629,34 @@ class TestingView(v.View):
     def anglePotIn(self, value):
         if self.app.streaming:
             self.anglePots = np.append(self.anglePots, float(value))
-        else:
-            self.app.hd.stopStream()
+#         else:
+#             self.app.hd.stopStream()
     def angleImuIn(self, value):
         if self.app.streaming:
 
             self.angleImus = np.append(self.angleImus, float(value))
-        else:
-            self.app.hd.stopStream()
+#         else:
+#             self.app.hd.stopStream()
 
     def forceXIn(self, value):
         if self.app.streaming:
 
             self.loadsX = np.append(self.loadsX, float(value))
-        else:
-            self.app.hd.stopStream()
+#         else:
+#             self.app.hd.stopStream()
 
     def forceYIn(self, value):
         if self.app.streaming:
 
             self.loadsY = np.append(self.loadsY, float(value))
-        else:
-            self.app.hd.stopStream()
+#         else:
+#             self.app.hd.stopStream()
 
     def millisIn(self, value):
         if self.app.streaming:
             self.times = np.append(self.times, float(value))
-        else:
-            self.app.hd.stopStream()
+#         else:
+#             self.app.hd.stopStream()
         print('raspi: ' + str(int((t.time() - self.tr)*1000)), 'arduino: ' + str(float(value) - self.ta))
         self.tr = t.time()
         self.ta = float(value)

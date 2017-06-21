@@ -6,6 +6,8 @@ import defs as d
 from views import view as v
 from utils import text as txt
 from items import message as msg
+from items import viewBtn as vb
+ 
 import os
 class SettingsView(v.View):
     def __init__(self, app, prevView = None):
@@ -37,13 +39,20 @@ class SettingsView(v.View):
         self.addStnBtns()
     def setStnFocusNum(self, num):
         self.stnBtnFocusNum = num
-
+    
     def addStnBtns(self):
         self.stnBtns = []
         for i in range(len(self.stnBtnDefs)):
             row = self.stnBtnsRows[i // 3]
             col = self.stnBtnsCols[i % 3]
-            self.stnBtns.append(self.SettingBtn(self.app, {'x': col, 'y': row}, self.stnBtnDefs[i],i == self.stnBtnFocusNum))
+            self.stnBtns.append(vb.ViewBtn(app = self.app,
+                                           pos = (col, row),
+                                           dim = (20*d.px, 18*d.py),
+                                           label = self.stnBtnDefs[i]['label'],
+                                           funct = self.stnBtnDefs[i]['funct'],
+                                           focus =  i == self.stnBtnFocusNum),
+                                )            
+#             self.stnBtns.append(self.SettingBtn(self.app, {'x': col, 'y': row}, self.stnBtnDefs[i],i == self.stnBtnFocusNum))
     def displayView(self):
         for stnBtn in self.stnBtns:
             stnBtn.display()
@@ -104,45 +113,45 @@ class SettingsView(v.View):
             self.stnBtns[self.stnBtnFocusNum].setFocus(False)
             self.stnBtnFocusNum+=1
             self.stnBtns[self.stnBtnFocusNum].setFocus(True)
-
-    class SettingBtn:
-        def __init__(self, app,geoData, metaData, focus):
-            self.app = app
-            self.disp = self.app.disp
-            self.x = geoData['x']
-            self.y = geoData['y']
-            self.xdim = 18*d.px
-            self.ydim = 18*d.py
-            self.label = metaData['label']
-            self.funct = metaData['funct']
-            self.setFocus(focus)
-            self.txtDim = int(3.8*d.px)
-            self.setBcgCol()
-
-            self.setFontCol()
-
-            self.setFont()
-
-            self.setTxt()
-
-        def setFocus(self, focus):
-            self.focus = focus
-            self.setBcgCol()
-            self.app.updateScreen()
-        def setTxt(self):
-            self.txt = self.font.render(self.label, True, self.fontCol)
-        def setFont(self):
-            self.font = pg.font.SysFont('Arial', self.txtDim, bold = True)
-        def setBcgCol(self):
-            self.bcgCol = d.textView_highlight_col if self.focus else self.app.textView_col
-        def setFontCol(self):
-            self.fontCol = self.app.font_col
-
-        def display(self):
-            # display rect
-            pg.draw.rect(self.disp, self.bcgCol, (self.x - self.xdim / 2, self.y - self.ydim / 2, self.xdim, self.ydim))
-            #display number
-            self.disp.blit(self.txt, (self.txt.get_rect(center=(self.x, self.y))))
+            
+#     class SettingBtn:
+#         def __init__(self, app,geoData, metaData, focus):
+#             self.app = app
+#             self.disp = self.app.disp
+#             self.x = geoData['x']
+#             self.y = geoData['y']
+#             self.xdim = 18*d.px
+#             self.ydim = 18*d.py
+#             self.label = metaData['label']
+#             self.funct = metaData['funct']
+#             self.setFocus(focus)
+#             self.txtDim = int(3.8*d.px)
+#             self.setBcgCol()
+# 
+#             self.setFontCol()
+# 
+#             self.setFont()
+# 
+#             self.setTxt()
+# 
+#         def setFocus(self, focus):
+#             self.focus = focus
+#             self.setBcgCol()
+#             self.app.updateScreen()
+#         def setTxt(self):
+#             self.txt = self.font.render(self.label, True, self.fontCol)
+#         def setFont(self):
+#             self.font = pg.font.SysFont('Arial', self.txtDim, bold = True)
+#         def setBcgCol(self):
+#             self.bcgCol = d.textView_highlight_col if self.focus else self.app.textView_col
+#         def setFontCol(self):
+#             self.fontCol = self.app.font_col
+# 
+#         def display(self):
+#             # display rect
+#             pg.draw.rect(self.disp, self.bcgCol, (self.x - self.xdim / 2, self.y - self.ydim / 2, self.xdim, self.ydim))
+#             #display number
+#             self.disp.blit(self.txt, (self.txt.get_rect(center=(self.x, self.y))))
 
     """
     Update SUB Stick structure

@@ -7,10 +7,12 @@ Main menu view (welcome screen)
 '''
 
 import pygame as pg
-import views.view as v
+from views import view as v
+from items import viewBtn as vb
 import defs as d
 import time as t
 from utils import text as txt
+
 class MainView(v.View):
     def __init__(self, app):
 
@@ -32,8 +34,8 @@ class MainView(v.View):
 
         super().__init__(app)
 
-        self.caTtlfont = pg.font.SysFont('Arial', 40, bold = True)
-        self.caTtltxt = self.caTtlfont.render('CROP DEVICE ' + self.app.getSetting(d.VERSION), True, d.font_col_inv)
+        self.caTtlfont = pg.font.SysFont('Arial', int(6*d.px), bold = True)
+        self.caTtltxt = self.caTtlfont.render('STALK STRENGTH DEVICE ' + self.app.getSetting(d.VERSION), True, d.font_col_inv)
 
         self.numViewBtnRow = 2
         self.numViewBtnCom = 2
@@ -43,30 +45,28 @@ class MainView(v.View):
 
         self.addViewBtns()
                 
-    def setViewFocusNum(self, num):
+    def setViewBtnsFocusNum(self, num):
         self.viewBtnFocusNum = num
         
     def addViewBtns(self):
         self.viewBtns = []
         for i in range(len(self.viewBtnDefs)):
-            row = self.viewBtnsRows[i // self.numViewBtnsCom]
-            col = self.viewBtnsCols[i % self.numViewBtnsRow]
+            row = self.viewBtnsRows[i // self.numViewBtnCom]
+            col = self.viewBtnsCols[i % self.numViewBtnRow]
             
-            self.viewBtns.append.(vb.ViewBtn(app = self.app,
+            self.viewBtns.append(vb.ViewBtn(app = self.app,
                                      pos = (col,row),
-                                     dim = (25*d.px,18*d.py),
+                                     dim = (30*d.px,18*d.py),
                                      label = self.viewBtnDefs[i]['label'],
                                      value = 'N/A',
                                      funct = self.viewBtnDefs[i]['funct'],
-                                     focus = False
+                                     focus = False,
+                                     formating = lambda lab, val: lab+ ': ' + str(val)
                                      )
+                                 )
                                      
                                      
             
-            
-#             self.stnBtns.viewBtns(self.SettingBtn(self.app, {'x': col, 'y': row}, self.stnBtnDefs[i],i == self.stnBtnFocusNum))
-#         for stnBtn in self.stnBtns:
-#             stnBtn.display()
     def select(self):
         self.app.hd.getAll()
 
@@ -195,7 +195,7 @@ class MainView(v.View):
         from items import message as ms
         self.pushMsg(ms.Message(self.app, self, self.disp,
                                 'EXITING',
-                                'Choose exit mode.',#  You are about\n to exit. Just saying \nSo you will be exiting after you click yes so think about it very hard cause that might bring some unwanted consequences I think. One final word... this is very long.',
+                                'Choose exit mode. You are about to exit. Just saying. So you will be exiting after you click yes so think about it very hard cause that might bring some unwanted consequences I think. One final word... this is very long.',
                                 btnDefs = (
                                     {'label': 'EXIT', 'id': 'exitBtn', 'funct': self.bringExitMsg},
                                     {'label': 'RESTART', 'id': 'restartBtn', 'funct': self.bringRestartMsg},

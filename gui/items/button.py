@@ -15,11 +15,7 @@ class Button:
         self.label = bluePrint['label']
         
         self.setBcgCol()
-        self.setFontCol()        
-        
-        self.fontSize = d.BTN_FS
-        self.font = self.app.btnFont
-        
+                
         #TEXT RENDERING%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #         self.labelRows = self.label.splitlines()
 #         self.txtRows = []
@@ -30,18 +26,16 @@ class Button:
 
     def setBcgCol(self):
             self.bcgCol = self.app.textView_col
-    def setFontCol(self):
-        self.fontCol = self.app.font_col
+
     def display(self):
         pg.draw.rect(self.disp, self.bcgCol, (self.x-self.xdim/2, self.y-self.ydim/2, self.xdim, self.ydim))
         
-        txt.mpue(self.disp,
-                 self.label,
-                 self.fontCol,
-                 (self.x-self.xdim/2, self.y-self.ydim/2),
-                 self.ydim,
-                 self.font,
-                 self.fontCol
+        txt.mpue(disp = self.disp,
+                 text = self.label,
+                 pos = (self.x, self.y),
+                 height = self.ydim,
+                 font = self.app.btnFont,
+                 fontCol = self.app.font_col
                  )
         #TEXT RENDERING%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%               
 #         for txtRow in self.txtRows:
@@ -49,9 +43,6 @@ class Button:
         #TEXT RENDERING%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
 #         self.disp.blit(self.txt, (self.txt.get_rect(center=(self.x, self.y))))
-
-    def removeUI(self):
-        pass
 
     def action(self):
         if callable(self.funct):

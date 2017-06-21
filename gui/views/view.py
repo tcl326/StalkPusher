@@ -18,6 +18,7 @@ import items.butArea as ba
 from hardware import hdInterface2 as hd
 from utils import text as txt
 from items import viewBtn as vb
+
 TIME_DEL = '_'
 class View(object):
     def __init__(self, app, prevView = None):
@@ -53,7 +54,7 @@ class View(object):
                                 btnDefs = (
                                     {'label': 'OK', 'id': 'exitBtn', 'funct': self.popMsg},
                                     {'label': 'RETRY', 'id': 'restartBtn', 'funct': self.retrySerialConn},
-                                    {'label': 'RESTART DEVICE', 'id': 'restartBtn', 'funct': self.bringRestartMsg},
+                                    {'label': 'RESTART\nDEVICE', 'id': 'restartBtn', 'funct': self.bringRestartMsg},
                                     {}
                                 )
                                 )
@@ -104,7 +105,7 @@ class View(object):
         
         txt.spu(self.disp,
                 self.title,
-                (self.cax, self.cay),
+                (self.cax, 5*d.py),
                 self.app.viewTtlFont,
                 d.invertColor(self.app.bcg_col)
                 )

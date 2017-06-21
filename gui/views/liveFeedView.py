@@ -19,7 +19,7 @@ class LiveFeedView(v.View):
         self.btnDefs = [(
                 {'label': 'STOP/\nSTART', 'id': 'bckbtn', 'funct': self.uPause},
                 {'label': 'ADC', 'id': 'bckbtn', 'funct': self.toADC},
-                {},#'label': 'Except', 'id': 'bckbtn', 'funct': self.throwExc
+                {'label': 'Except', 'id': 'bckbtn', 'funct': self.throwExc},#'label': 'Except', 'id': 'bckbtn', 'funct': self.throwExc
                 {'label': 'BACK', 'id': 'bckbtn', 'funct': self.back},
             ),
             (

@@ -59,10 +59,17 @@ class NumChoice:
         elif self.unitPos == 'prefix':
             xPos = self.x - 14*d.px - 10*d.px
 
-        self.unitLabel = rl.RectLabel(
-            self.app,
-            {'x': xPos, 'y': self.y, 'xdim': 8 * d.px, 'ydim': 8 * d.px},
-            {'txt':self.valueUnit,'txtDim':4*d.px, 'color': self.app.textView_col})
+        self.unitLabel = rl.RectLabel(app = self.app,
+                                      pos = (xPos, self.y),
+                                      dim = ( 8 * d.px, 8 * d.px),
+                                      text = self.valueUnit,
+                                      font = self.app.numKeyFont
+                                      )
+
+#         self.unitLabel = rl.RectLabel(
+#             self.app,
+#             {'x': xPos, 'y': self.y, 'xdim': 8 * d.px, 'ydim': 8 * d.px},
+#             {'txt':self.valueUnit,'txtDim':4*d.px, 'color': self.app.textView_col})
 
     def display(self):
         for btn in self.btns:
@@ -103,7 +110,14 @@ class NumChoice:
             self.value = value
             self.focus = focus
             color = d.textView_highlight_col if self.focus else self.app.textView_col
-            self.rectLabel = rl.RectLabel(self.app, butGeo, {'txt':str(self.value),'txtDim':4*d.px, 'color': color})
+            
+            self.rectLabel = rl.RectLabel(app = self.app,
+                                          pos = (butGeo['x'], butGeo['y']),
+                                          dim = (butGeo['xdim'], butGeo['ydim']),
+                                          text = value,
+                                          font = self.app.numKeyFont,
+                                          bcgCol = color
+                                          )
 
         def setFocus(self, focus):
             self.focus  = focus
@@ -112,7 +126,6 @@ class NumChoice:
                 self.rectLabel.setBcgCol(d.textView_highlight_col)
             else:
                 self.rectLabel.setBcgCol((self.app.textView_col))
-            self.app.updateScreen()
         def display(self):
             self.rectLabel.display()
             if (self.focus):
@@ -126,4 +139,5 @@ class NumChoice:
                 self.value = 0
             elif self.value == -1:
                 self.value = 9
-            self.rectLabel.setTxt(self.value)
+            self.rectLabel.setText(self.value)
+            

@@ -73,6 +73,11 @@ class Graph:
         self.ax.xaxis.set_major_locator(ticker.MaxNLocator(4))
         self.ax.yaxis.set_major_locator(ticker.MaxNLocator(5))
         
+        
+        print('x', len(x))
+        print('y1', len(y1))
+        print('y2', len(y2))
+
         self.ax.plot(x, y1,
             'o',
             markersize=int(0.8*d.px),

@@ -1,18 +1,20 @@
-from main import defs as d
 """
 ViewBtn: a basic UI item displayed as a rectangle with text
 contains a label, a value, a function
 has two states: focus / no focus 
 """
+from main import defs as d
+from items import rectLabel as rl
 class ViewBtn:
     def __init__(self,
                  app,
                  pos,
                  dim,
                  label,
-                 value
+                 value = '',
                  funct = None,
                  focus = False,
+                 formating = lambda lab, val :lab
                 ):
         self.app = app
         self.disp = self.app.disp
@@ -30,25 +32,26 @@ class ViewBtn:
         
         self.focus = focus
         
-        self.rl = rl.RectLabel(self.app,
-                               (self.x, self.y),
-                               (self.xdim, self.ydim),
-                               self.makeRlText(),
-                               self.app.stnBtnFont,
-                               self.app.font_col,
-                               self.bcgCol
+        self.formating = formating
+        
+        self.rl = rl.RectLabel(app=self.app,
+                               pos=(self.x, self.y),
+                               dim=(self.xdim, self.ydim),
+                               text=self.formating(self.label, self.value),
+                               font=self.app.stnBtnFont,
+                               bcgCol=d.textView_highlight_col if self.focus else self.app.textView_col,
                                )
         
     def setValue(self, value):
         self.value = value
-        self.rl.setText(self.makeLabel())
+        self.rl.setText(self.formating(self.label, self.value))
             
     def setFocus(self, focus):
         self.focus = focus
         self.rl.setBcgCol(d.textView_highlight_col if self.focus else self.app.textView_col)
         
     def makeRlText(self):
-        return self.label+ ': ' + str(self.value) + ('mm' if self.label == 'Height' else '')
+        return self.label+ ': ' + str(self.value)
     
     def display(self):
         self.rl.display()

@@ -64,11 +64,14 @@ class HardWare:
         connThread.daemon = True
         connThread.start()
     def startReadThread(self):
+        self.readFromSerial = True
         readThread = thr.Thread(target = self.readSerial)
         readThread.setName('READ THREAD')
         readThread.daemon = True
         readThread.start()
         print('started read thread')
+    def stopReadThread(self):
+        self.readFromSerial = False
     def establishConnection(self):
         self.arduino = None
         tries = 0
@@ -102,9 +105,17 @@ class HardWare:
                 except Exception as e:
                     print('serial USB 1 establish error:', str(e))
         self.connectionFailed()
-
+    def closeConnection(self):
+        if self.arduino is not None:
+            self.stopReadThread()
+            self.stopStream()
+            self.connected = False
+            self.arduino.close()
+            self.arduino = None
+            
     def confirmConnection(self):
         print('connection made, waiting for confirmation')
+        self.stopStream()
 
         initQueryT = t.time()
         while t.time() - initQueryT < CONN_TIMEOUT:
@@ -135,15 +146,10 @@ class HardWare:
 #READING DATA
 ########################################################## 
     def readSerial(self):
-        while True:
-
+        while self.readFromSerial:
             #if self.app.streaming:
-#             print('1a')
             ard_input = self.readFromArd()
-#             print('2a')
 #             print('READ THREAD: A' + ard_input + 'A ' + str(t.time() - self.lastIn))
-            self.lastIn = t.time()
-#             print('3a')
 
             if len(ard_input) > 0:
                  
@@ -151,7 +157,7 @@ class HardWare:
                 #check if acknowledgement
                 if re.match(ACK_COMM, ard_input) != None:        #check if dataIn
                     #we have an acknowledgement
-#                     print('ACKNOWLEDGEMENT: |' + ard_input + '|')                    
+                    print('ACKNOWLEDGEMENT: |' + ard_input + '|', t.time())                    
                     ack_comm = re.findall(ACK_COMM, ard_input)[0]
                     self.parseAck(ack_comm)
                 elif re.match(DATA_IN_COMM, ard_input) != None:
@@ -163,7 +169,7 @@ class HardWare:
                         if not self.isConnected():
                             self.connectionConfirmed()
                 else:
-#                     print('NOT DATA IN: |' + ard_input + '|')
+                    print('NOT DATA IN: |' + ard_input + '|')
                     pass
                 #t.sleep(0.01)
 #             print('4a')
@@ -173,6 +179,7 @@ class HardWare:
 ########################################################## 
     def parseAck(self, ack_comm):
         if not self.isConnected():
+            print('CONN MADE ANCKNOWLEDGEMENT:', ack_comm)
             self.connectionConfirmed()
 
 #         if ack_comm == READY:
@@ -201,26 +208,26 @@ class HardWare:
         with self.threadLock:
             for data in data_list:
                 self.processData(data)
-    def processStreamData(self, data_list):
-        print('processing streamin data')
-        for data in data_list:
-            #print(data[0], data[1])
-            if data[0] == FX:
-                forceValueX = data[1]
-            elif data[0] == FY:
-                forceValueY = data[1]
-#             elif data[0] == AN:
-#                 angleValue = data[1]
-            elif data[0] == AP:
-                anglePot = data[1]
-            elif data[0] == AI:
-                angleImu = data[1]
-            elif data[0] == MI:
-                timeValue = data[1]
-        if self.app.streaming:
-            self.app.view.fullStreamDataIn(anglePot, angleImu, forceValueX, forceValueY, timeValue)
-        else:
-            self.stopStream()
+#     def processStreamData(self, data_list):
+#         print('processing streamin data')
+#         for data in data_list:
+#             #print(data[0], data[1])
+#             if data[0] == FX:
+#                 forceValueX = data[1]
+#             elif data[0] == FY:
+#                 forceValueY = data[1]
+# #             elif data[0] == AN:
+# #                 angleValue = data[1]
+#             elif data[0] == AP:
+#                 anglePot = data[1]
+#             elif data[0] == AI:
+#                 angleImu = data[1]
+#             elif data[0] == MI:
+#                 timeValue = data[1]
+#         if self.app.streaming:
+#             self.app.view.fullStreamDataIn(anglePot, angleImu, forceValueX, forceValueY, timeValue)
+#         else:
+#             self.stopStream()
 
     def processData(self, data):
         #print('processing data')
@@ -286,27 +293,42 @@ class HardWare:
         command = STOP+'0000'
         self.sendCommand(command)
     def sendCommand(self, command):
+        print('writing command to arduino', t.time(), 'we have that many bytes', self.arduino.inWaiting())
         ardCommand = START_CHAR+command+END_CHAR
-        cmdThread = thr.Thread(target = self.writeToArd, args = (ardCommand,))
-        cmdThread.setName('SEND COMMAND THREAD')
-        cmdThread.daemon = True
-        cmdThread.start()
+        self.writeToArd(ardCommand)
+        print('finished writing command to arduino', t.time(), 'we have that many bytes', self.arduino.inWaiting())
+
+#         cmdThread = thr.Thread(target = self.writeToArd, args = (ardCommand,))
+#         cmdThread.setName('SEND COMMAND THREAD')
+#         cmdThread.daemon = True
+#         cmdThread.start()
         #self.writeToArd(ardCommand)
     def writeToArd(self, comm):
-        print('Writing command of length ' +str(len(comm))+':', comm)
         with self.threadLock:
-            self.arduino.flushInput()
-            self.arduino.flushOutput()
-            self.arduino.write((comm + '\n').encode('utf-8'))
+            if self.arduino is not None:
+                print('Writing command of length ' +str(len(comm))+':', comm)
+                self.arduino.flushInput()
+                self.arduino.flushOutput()
+                self.arduino.write((comm + '\n').encode('utf-8'))
+            else:
+                print('Arduino is none. Cannot write command of length ' +str(len(comm))+':', comm)
+                
     def readFromArd(self):
         with self.threadLock:
-            incomingBytes = self.arduino.readline()
-            try:                
+            try:
+    #             print('reading line')                
+                incomingBytes = self.arduino.readline()
+    #             print('read line')                
+    
                 incomingString = incomingBytes.decode()
                 incoming = incomingString.rstrip()
                 return incoming
             except Exception as e:
                 print('Invaid data received: ' + str(e))
+                print('most likely due to constant streaming')
+                print('closing connection')
+                self.closeConnection()
+                self.initConnThread()
                 return ''
     
     

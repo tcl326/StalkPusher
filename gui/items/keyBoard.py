@@ -102,13 +102,21 @@ class Keyboard:
             self.xdim = geoData['xdim']
             self.ydim = geoData['ydim']
             self.rectLabel = rl.RectLabel(
-                self.app,
-                geoData,
-                {'txt':char,
-                'txtDim':3*d.px,
-                'color': self.app.textView_col
-                 }
-            )
+                                app = self.app,
+                                pos = (self.x, self.y),
+                                dim = (self.xdim, self.ydim),
+                                text = char,
+                                font = self.app.kbKeyFont
+                            )
+            
+#             self.rectLabel = rl.RectLabel(
+#                 self.app,
+#                 geoData,
+#                 {'txt':char,
+#                 'txtDim':3*d.px,
+#                 'color': self.app.textView_col
+#                  }
+#             )
         def display(self):
             self.rectLabel.display()
 

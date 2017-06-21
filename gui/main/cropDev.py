@@ -236,6 +236,7 @@ class CropDevMain:
 #         print(output)
         
     def restartSoftware(self):
+        self.hd.closeConnection()
         """Restarts the current program.
         Note: this function does not return. Any cleanup action (like
         saving data) must be done before calling this function."""
@@ -244,12 +245,14 @@ class CropDevMain:
 
 
     def restartPi(self):
+        self.hd.closeConnection()
         command = "/usr/bin/sudo /sbin/shutdown -r now"
         import subprocess
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
         output = process.communicate()[0]
         print(output)
     def shutdownPi(self):
+        self.hd.closeConnection()
         command = "/usr/bin/sudo /sbin/shutdown -h now"
         import subprocess
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
@@ -278,4 +281,5 @@ if __name__ == '__main__':
 #     sys.stderr = cropDevErrorLogFile
     mw = CropDevMain()
     pg.quit()
+    mw.hd.closeConnection()
     quit()

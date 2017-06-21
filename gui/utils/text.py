@@ -84,14 +84,14 @@ def spu(disp, text, pos, font, fontCol = d.font_col_d, bold = True):
     disp.blit(txtObj, txtObj.get_rect(center=pos))
 
 def spt(disp, text, pos, width, font, fontCol = d.font_col_d, bold = True):
-    xFit = font.size(text)[0] <= maxWidth           
+    xFit = font.size(text)[0] <= width           
     if not xFit:
         text = text + '..'
         
     while not xFit:
         fontWidth = font.size(text)[0]
         if fontWidth > width:
-            str = str[:-3] + '..'
+            text = text[:-3] + '..'
         else:
             xFit = True
     
@@ -101,12 +101,12 @@ def spt(disp, text, pos, width, font, fontCol = d.font_col_d, bold = True):
 
 def mpue(disp, text, pos, height, font, fontCol = d.font_col_d, bold = True):
         textRows = text.splitlines()
-        numRows = len(txtRows)        
+        numRows = len(textRows)        
         for i in range(numRows):
             x = pos[0]
             y = pos[1] - height/2 + (i+1)*height/(numRows+1)
             txtObj = font.render(textRows[i], bold, fontCol)
-            disp.blit(txtObj, txtObj.get_rect(center=p(x, y)))    
+            disp.blit(txtObj, txtObj.get_rect(center=(x, y)))    
 '''
 mpta is a modified version of function provided below:
 http://pygame.org/wiki/TextWrap
@@ -116,8 +116,9 @@ http://pygame.org/wiki/TextWrap
 # returns any text that didn't get blitted
 def mpta(disp, text, pos, dim, font, fontCol = d.font_col_d):
     #account for different positioning convention
-    pos[0] -= dim[0]/2
-    pos[1] -= dim[1]/2
+    pos = (pos[0]-dim[0]/2, pos[1]-dim[1]/2)
+#     pos[0] -= dim[0]/2
+#     pos[1] -= dim[1]/2
 
     rect = pg.Rect(pos, dim)
     y = rect.top
@@ -128,7 +129,7 @@ def mpta(disp, text, pos, dim, font, fontCol = d.font_col_d):
     
     texts = text.splitlines()
     for textLine in texts:
-        while text:
+        while textLine:
             i = 1
     
             # determine if the row of text will be outside our area
@@ -141,7 +142,7 @@ def mpta(disp, text, pos, dim, font, fontCol = d.font_col_d):
     
             # if we've wrapped the text, then adjust the wrap to the last word      
             if i < len(textLine): 
-                i = text.rfind(" ", 0, i) + 1
+                i = textLine.rfind(" ", 0, i) + 1
     
             # render the line and blit it to the surface
             image = font.render(textLine[:i], True, fontCol)
@@ -151,6 +152,7 @@ def mpta(disp, text, pos, dim, font, fontCol = d.font_col_d):
     
             # remove the text we just blitted
             textLine = textLine[i:]
+
 def sdu():
     pass            
 ###############################################################################

@@ -33,20 +33,26 @@ class KeyboardView(v.View):
         self.currNotesY = self.cay
         self.input = str(input)
         self.suffix = suffix
-        self.inputRect = rl.RectLabel(
-            self.app,
-            {
-                'x':self.cax,
-                'y':self.cay-24*d.py,
-                'xdim':58*d.px,
-                'ydim':8*d.py
-            },
-            {
-                'txt':self.input + ' ' + self.suffix,
-                'txtDim': 5*d.px,
-                'color': self.app.textView_col
-            }
-        )
+        self.inputRect = rl.RectLabel(app = self.app,
+                                  pos = (self.cax, self.cay - 24*d.py),
+                                  dim = (58*d.px, 8*d.py),
+                                  text = self.input + ' ' + self.suffix,
+                                  font = self.app.nlFont,
+                                  )
+#         self.inputRect = rl.RectLabel(
+#             self.app,
+#             {
+#                 'x':self.cax,
+#                 'y':self.cay-24*d.py,
+#                 'xdim':58*d.px,
+#                 'ydim':8*d.py
+#             },
+#             {
+#                 'txt':self.input + ' ' + self.suffix,
+#                 'txtDim': 5*d.px,
+#                 'color': self.app.textView_col
+#             }
+#         )
         self.initKeyBoard(type)
     def initKeyBoard(self, type):
         if type == d.NUM:
@@ -93,7 +99,7 @@ class KeyboardView(v.View):
     def addChar(self):
         if len(self.input)<self.maxlen:
             self.input += self.keyBoard.getChar()
-            self.inputRect.setTxt(self.input + ' ' + self.suffix)
+            self.inputRect.setText(self.input + ' ' + self.suffix)
         else:
             self.pushMsg(msg.Message(self.app, self, self.disp,
                                     'Input too long',
@@ -110,7 +116,7 @@ class KeyboardView(v.View):
     def backSpace(self):
         if len(self.input)>0:
             self.input = self.input[:-1]
-            self.inputRect.setTxt(self.input)
+            self.inputRect.setText(self.input)
 
 
     def back(self):
