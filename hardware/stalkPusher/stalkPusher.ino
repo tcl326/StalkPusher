@@ -7,7 +7,7 @@
 //      Arduino Pro Mini 5V
 //      Adafruit Ultimate GPS V3    Rx->02 | Tx->03
 // The schematic of this setup should (hopefully) always be available at https://github.com/tcl326/StalkPusher/tree/master/hardware/schematics
-// The communication protocol between the Pi and this Arduino is detailed at 
+// The communication protocol between the Pi and this Arduino is detailed at
 //
 // 21/06/2017 by Ting-Che Lin <tcl326@nyu.edu> or <tingchel@andrew.cmu.edu>
 
@@ -21,8 +21,8 @@
 #include <Wire.h>
 
 //define IMU variables
-#define LSM9DS0_XM  0x1D 
-#define LSM9DS0_G   0x6B 
+#define LSM9DS0_XM  0x1D
+#define LSM9DS0_G   0x6B
 #define GRAVITY (9.80665F)
 
 //define GPS variables
@@ -99,7 +99,7 @@ float kalmanCalculate(float, float, double, float);
 void setup() {
   //initialize Serial Connection with Pi at 19200 baudrate
   Serial.begin(19200);
-  
+
   //initialize boolean variables
   readCommand = false;
   start = false;
@@ -109,7 +109,7 @@ void setup() {
   //initialize GPS
   GPS.begin(9600);
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);  
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
   gpsSerial.println(PMTK_Q_RELEASE);
   useInterrupt(true);
 
@@ -129,13 +129,13 @@ void setup() {
   adsLoadY.setRate(ADS1115_RATE_860);
 
   //initialize IMU
-  if(! lsm.begin()){
+  if (! lsm.begin()) {
     Serial.println("IMU not Found");
   }
 
   //initialize timer to measure the time passing since the program started (necessary for kalman filter)
   timer = micros();
-  
+
   delay(100);
   Serial.println("%RDDYRECE$"); //Serial out message to indicate that the Arduino is ready to the Pi
 }
@@ -144,17 +144,21 @@ void loop() {
   char theChar; //buffer for Serial input
   command = ""; //reset command
   value = "";   //reset value of command
-  if (Serial.available()) {
+  while (Serial.available()) {
     theChar = Serial.read();
+    //    Serial.println("TimeStamp Receive Byte: " + String(theChar) + " at time: " + String(millis()));
     reader(start, parse, dataInputBuffer, theChar); //read the incoming Bytes and if the message matches the communication protocol, parse is made True.
     if (parse) {
       parser(command, value, dataInputBuffer, dataIndex); //parse the incoming message that matched the protocol
       parse = false;
       readCommand = true;
+      //      Serial.println("TimeStamp Receive Data: " + String(millis()));
     }
   }
   if (readCommand) {
+    //      Serial.println("TimeStamp PrepCommand: " + String(millis()));
     Serial.println("%" + command + "RECE" + "$"); //echo back the command to indicate that the command message has been received.
+    //      Serial.println("TimeStamp Send Command: " + String(millis()));
     if (command == "PCLL") {
       if (value == "0000") {
         sendTimeStamp = true;
@@ -176,7 +180,7 @@ void loop() {
       }
       toPerCall = true;
     }
-    if (command == "LIVE"){
+    if (command == "LIVE") {
       liveFeed = true;
     }
     if (command == "STRM") {
@@ -200,6 +204,7 @@ void loop() {
     if (command == "STOP") {
       toStream = false;
       liveFeed = false;
+      //        Serial.println("TimeStamp Stop Stream: " + String(millis()));
       GPS.wakeup(); //Wake the GPS up once the testing is finished.
     }
     readCommand = false;
@@ -208,12 +213,13 @@ void loop() {
     streaming(); //stream test data
   }
   else {
+
     resetStreamBool();
   }
   if (toPerCall) {
     perCall();
   }
-  if (liveFeed){
+  if (liveFeed) {
     streamFeed(); //stream live data
   }
   updateAngleKalman(); //update the angle using Kalman filter
