@@ -153,6 +153,7 @@ void loop() {
       parse = false;
       readCommand = true;
       //      Serial.println("TimeStamp Receive Data: " + String(millis()));
+      break;
     }
   }
   if (readCommand) {
