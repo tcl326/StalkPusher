@@ -1,7 +1,7 @@
 """
 ---
 Abbreviations
-s: singleline / m: multiline
+s: singleline / m: multiline (which means single or multi)
 p: predefined font size / d: dynamic font size
 t: truncated / u: untruncated
 a: automatic line switch / e: explicit line switch
@@ -37,6 +37,13 @@ Types of font rendering:
     *p
     *t to fit box
     *a
+    *defined by x, y, fontSize, xdim, ydim
+    *used in Message bodies
+- mpte
+    *m
+    *p
+    *t with '..' to fit box
+    *e
     *defined by x, y, fontSize, xdim, ydim
     *used in Message bodies
 
@@ -106,7 +113,18 @@ def mpue(disp, text, pos, height, font, fontCol = d.font_col_d, bold = True):
             x = pos[0]
             y = pos[1] - height/2 + (i+1)*height/(numRows+1)
             txtObj = font.render(textRows[i], bold, fontCol)
-            disp.blit(txtObj, txtObj.get_rect(center=(x, y)))    
+            disp.blit(txtObj, txtObj.get_rect(center=(x, y))) 
+            
+def mpte(disp, text, pos, dim, font, fontCol = d.font_col_d, bold = True):
+        textRows = text.splitlines()
+        numRows = len(textRows)        
+        for i in range(numRows):
+            x = pos[0]
+            y = pos[1] - dim[1]/2 + (i+1)*dim[1]/(numRows+1)
+            spt(disp, textRows[i], (x, y), dim[0], font, fontCol, bold)
+#             txtObj = font.render(textRows[i], bold, fontCol)
+#             disp.blit(txtObj, txtObj.get_rect(center=(x, y)))    
+   
 '''
 mpta is a modified version of function provided below:
 http://pygame.org/wiki/TextWrap
@@ -117,8 +135,6 @@ http://pygame.org/wiki/TextWrap
 def mpta(disp, text, pos, dim, font, fontCol = d.font_col_d):
     #account for different positioning convention
     pos = (pos[0]-dim[0]/2, pos[1]-dim[1]/2)
-#     pos[0] -= dim[0]/2
-#     pos[1] -= dim[1]/2
 
     rect = pg.Rect(pos, dim)
     y = rect.top

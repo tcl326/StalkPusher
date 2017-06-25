@@ -21,6 +21,7 @@ from utils import text as txt
 from views import keyboardView as kbv
 from items import message as msg
 from utils import postProcess as pp
+from utils import dateParse as dp
 from items import viewBtn as vb
 preTest = 0
 inTest = 1
@@ -76,10 +77,11 @@ class TestingView(v.View):
         self.inPrRect = rl.RectLabel(app = self.app,
                                      pos = (self.cax,  self.cay),
                                      dim = (70*d.px, 70*d.py),
-                                     text = 'TESTING IN PROGRESS',
+                                     text = 'TESTING\nIN PROGRESS',
                                      font = self.app.viewTtlFont,
                                      fontCol = self.app.font_col,
-                                     bcgCol = d.light_green
+                                     bcgCol = d.light_green,
+                                     scaleFactor = 0.7
                                      )#in progress rectangle
         self.makeConfirmMsgs()
         
@@ -91,49 +93,66 @@ class TestingView(v.View):
         
         self.items = []
         self.postItems = []
-
+        
+        yRef = 26 * d.py
+        yInt = 20 * d.py
+        self.columns = 2
+        self.rows = 4
+        
         self.items.append(vb.ViewBtn(app = self.app,
-                                    pos = (self.cols[0], self.cay - 20 * d.py + 20 * 0 * d.py),
-                                    dim = (25*d.px, 18*d.py),
+                                    pos = (self.cols[0], self.cay - yRef + 0*yInt),
+                                    dim = (28*d.px, 18*d.py),
                                     label = 'FOLDER',
                                     value = self.app.getSetting(d.TEST_FOLDER),
                                     funct = self.toTestFolderSetting, 
                                     focus = True,
-                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    formating = lambda lab, val: lab+ ':\n' + str(val)
                                     )
                           )
         
-        self.items.append(self.NoteListWrapper(self.app,self.disp,{'x':self.cols[1],'y':self.cay-10*d.py, 'xdim':20*d.px, 'ydim': 15*d.py}, listName = 'postTestNotes', focus =False, metaData = {'funct': self.toNoteSetting}))
-        
+        self.items.append(self.NoteListWrapper(self.app,self.disp,{'x':self.cols[1],'y':self.cay-16*d.py, 'xdim':24*d.px, 'ydim': 18*d.py}, listName = 'preTestNotes', focus =False, metaData = {'funct': self.toNoteSetting}))
         self.items.append(vb.ViewBtn(app = self.app,
-                                    pos = (self.cols[0], self.cay - 20 * d.py + 20 * 1 * d.py),
-                                    dim = (25*d.px, 18*d.py),
+                                    pos = (self.cols[0], self.cay - yRef + 1*yInt),
+                                    dim = (28*d.px, 18*d.py),
                                     label = 'PLOT #',
                                     value = self.app.getSetting(d.TEST_PLOT),
                                     funct = self.toPlotSetting,
-                                    focus = True,
-                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    focus = False,
+                                    formating = lambda lab, val: lab+ ':\n' + str(val)
                                     )
                           )
-        self.items.append(self.NoteListWrapper(self.app,self.disp,{'x':self.cols[1],'y':self.cay+20*d.py, 'xdim':20*d.px, 'ydim': 15*d.py}, listName = 'preTestNotes', focus =False, metaData = {'funct': self.toNoteSetting}))
+        self.items.append(None)
         
         self.items.append(vb.ViewBtn(app = self.app,
-                                    pos = (self.cols[0], self.cay - 20 * d.py + 20 * 2 * d.py),
-                                    dim = (25*d.px, 18*d.py),
+                                    pos = (self.cols[0], self.cay - yRef + 2*yInt),
+                                    dim = (28*d.px, 18*d.py),
                                     label = 'HEIGHT',
                                     value = self.app.getSetting(d.TEST_HEIGHT),
                                     funct = self.toHeightSetting,
-                                    focus = True,
-                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    focus = False,
+                                    formating = lambda lab, val: lab+ ':\n' + str(val)
                                     )
                           )
                 
-        self.postItems.append(nl.NoteList(self.app, self.disp,{'x':self.cax-28*d.px,'y':self.cay, 'xdim':20*d.px, 'ydim': 25*d.py}, listName = 'postTestNotes', hasFocus = True))
+        self.items.append(self.NoteListWrapper(self.app,self.disp,{'x':self.cols[1],'y':self.cay+22*d.py, 'xdim':24*d.px, 'ydim': 18*d.py}, listName = 'postTestNotes', focus =False, metaData = {'funct': self.toNoteSetting}))
 
+        self.items.append(vb.ViewBtn(app = self.app,
+                                    pos = (self.cols[0], self.cay - yRef + 3*yInt),
+                                    dim = (28*d.px, 18*d.py),
+                                    label = 'OPERATOR',
+                                    value = self.app.getSetting(d.OPERATOR),
+                                    funct = self.setOperator,
+                                    focus = False,
+                                    formating = lambda lab, val: lab+ ':\n' + str(val)
+                                    )
+                          )
+        self.items.append(None)
+
+        self.postItems.append(nl.NoteList(self.app, self.disp,{'x':self.cax-29*d.px,'y':self.cay, 'xdim':20*d.px, 'ydim': 25*d.py}, listName = 'postTestNotes', hasFocus = True))
 
         self.postItems.append(vb.ViewBtn(app = self.app,
-                                    pos = (self.cax-10*d.px, self.cay + 40 * d.py),
-                                    dim = (15 * d.px, 10*d.py),
+                                    pos = (self.cax-4*d.px, self.cay + 42 * d.py),
+                                    dim = (22 * d.px, 12*d.py),
                                     label = 'Load',
                                     value = 'F',
                                     funct = self.switchLoadMode,
@@ -143,8 +162,8 @@ class TestingView(v.View):
                           )
 
         self.postItems.append(vb.ViewBtn(app = self.app,
-                                    pos = (self.cax+10*d.px, self.cay + 40 * d.py),
-                                    dim = (15 * d.px, 10*d.py),
+                                    pos = (self.cax+22*d.px, self.cay + 42 * d.py),
+                                    dim = (22 * d.px, 12*d.py),
                                     label = 'Rot.',
                                     value = 'IMU',
                                     funct = self.switchRotMode,
@@ -205,6 +224,17 @@ class TestingView(v.View):
                                     )
                                     )
                          )
+        self.pushMsg(msg.Message(self.app, self, self.disp,
+                                    'Confirm test operator.',
+                                    'Current operator is: ' + self.app.getSetting(d.OPERATOR),
+                                    btnDefs = (
+                                        {'label': 'CONFIRM', 'id': 'yesBtn', 'funct': self.popMsg},
+                                        {'label': 'EDIT', 'id': 'yesBtn', 'funct': (self.popMsg, self.setOperator)},
+                                        {},
+                                        {}
+                                    )
+                                    )
+                         )
         
         
     def setBreakHeight(self):
@@ -212,38 +242,49 @@ class TestingView(v.View):
                                       d.NUM,
                                       'Break Height',
                                       'breakHeight',
-                                      suffix = 'cm'
+                                      suffix = d.HEIGHT_UNIT
                                       ))
         
     def saveTest(self):
         dataMatrix = []
-        dataMatrix.append(['PLOT',self.app.getSetting(d.TEST_PLOT), 'SENSOR','A','B','UNIT'])
-        dataMatrix.append(['HEIGHT',self.app.getSetting(d.TEST_HEIGHT), d.DS_LOAD_X]+ list(self.getABUnit(d.DS_LOAD_X)))
+        ###TEST ATTRIBUTES
+        dataMatrix.append(['----------META DATA----------'])
+        dataMatrix.append(['SOFTWARE VERSION', self.app.getSetting(d.VERSION)])
+        dataMatrix.append(['DEVICE OPERATOR', self.app.getSetting(d.OPERATOR)])
 
-        dataMatrix.append(['TEMPERATURE', self.app.getEnvData(d.TEMPERATURE), d.DS_LOAD_Y]+ list(self.getABUnit(d.DS_LOAD_Y)))
-        dataMatrix.append(['HUMIDITY', self.app.getEnvData(d.HUMIDITY), d.DS_IMU]+ list(self.getABUnit(d.DS_IMU)))
+        dataMatrix.append(['----------TEST ATTRIBUTES----------'])
+        dataMatrix.append(['FIELD', 'VALUE', 'UNIT'])
+        
+        date = dp.DateParse(self.app.getEnvData(d.TIME))
+        dataMatrix.append(['YEAR', date.year])
+        dataMatrix.append(['MONTH', date.month])
+        dataMatrix.append(['DAY', date.day])
+        dataMatrix.append(['TIME', date.getTime(), d.TIME_UNIT])
+
+        dataMatrix.append(['PLOT',self.app.getSetting(d.TEST_PLOT), d.PLOT_UNIT])
+        dataMatrix.append(['HEIGHT',self.app.getSetting(d.TEST_HEIGHT), d.HEIGHT_UNIT])
+
+        dataMatrix.append(['TEMPERATURE', self.app.getEnvData(d.TEMPERATURE), self.getUnit(d.DS_TEMP)])
+        dataMatrix.append(['HUMIDITY', self.app.getEnvData(d.HUMIDITY), self.getUnit(d.DS_HUM)])
         
         gpsData = self.app.getEnvData(d.LOCATION)
         
         if gpsData != hd.NO_GPS:
             [lat, lon] = gpsData.split('|')
-            dataMatrix.append(['LATITUDE',lat, d.DS_POT]+ list(self.getABUnit(d.DS_POT)))
-            dataMatrix.append(['LONGITUDE',lon, d.DS_HUM]+ list(self.getABUnit(d.DS_HUM)))
+            dataMatrix.append(['LATITUDE', lat, d.GPS_UNIT])
+            dataMatrix.append(['LONGITUDE',lon, d.GPS_UNIT])
         else:
-            dataMatrix.append(['LATITUDE',hd.NO_GPS, d.DS_POT]+ list(self.getABUnit(d.DS_POT)))
-            dataMatrix.append(['LONGITUDE',hd.NO_GPS, d.DS_HUM]+ list(self.getABUnit(d.DS_HUM)))
+            dataMatrix.append(['LATITUDE', hd.NO_GPS, d.GPS_UNIT])
+            dataMatrix.append(['LONGITUDE', hd.NO_GPS, d.GPS_UNIT])
+        ###
+        ###NOTES
+        dataMatrix.append(['----------OPTIONAL DATA----------'])
 
         preNotes = self.app.getSetting(d.PRE_TEST_NOTES)
         for i in range(d.MAX_NOTES):
             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             toAppend = ['PRE_TEST_NOTE_' + str(i+1), preNotes[i] if i < len(preNotes) else '']
-            #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            if i ==0:
-                toAppend += [d.DS_TEMP] + list(self.getABUnit(d.DS_TEMP))
-                
-            if self.breakHeight is not None:
-                if i == 2:
-                    toAppend += ['BREAK_HEIGHT', self.breakHeight]    
+            #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                
 
             dataMatrix.append(toAppend)
         #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -253,14 +294,29 @@ class TestingView(v.View):
             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             dataMatrix.append(['POST_TEST_NOTE_' + str(i+1), postNotes[i] if i< len(postNotes) else ''])
             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+        
+        ###
+        dataMatrix.append(['BREAK_HEIGHT', self.breakHeight if self.breakHeight is not None else 'N/A', d.HEIGHT_UNIT]) 
+
+        ####SENSORS
+        dataMatrix.append(['----------SENSOR CALIBRATION DATA-----------'])
+
+        dataMatrix.append(['SENSOR','A','B','UNIT', 'ID'])
+        
+        sensorData = self.app.getSetting(d.SENSORS)
+        
+        dataMatrix.append([d.DS_LOAD_X] + list(self.getABUnit(d.DS_LOAD_X)) + [sensorData[d.DS_LOAD_X]])
+        dataMatrix.append([d.DS_LOAD_Y] + list(self.getABUnit(d.DS_LOAD_Y)) + [sensorData[d.DS_LOAD_Y]])
+        dataMatrix.append([d.DS_IMU] + list(self.getABUnit(d.DS_IMU)) + [sensorData[d.DS_IMU]])
+        dataMatrix.append([d.DS_POT] + list(self.getABUnit(d.DS_POT)) + [sensorData[d.DS_POT]])
+        dataMatrix.append([d.DS_TEMP] + list(self.getABUnit(d.DS_TEMP)) + [sensorData[d.DS_TEMP]])
+        dataMatrix.append([d.DS_HUM] + list(self.getABUnit(d.DS_HUM)) + [sensorData[d.DS_HUM]])                               
+                               
+        ###
+        
+        dataMatrix.append(['----------TEST DATA-----------'])
+        
         max_len = len(self.times)
-        
-        print('self.anglePots', len(self.anglePots))
-        print('self.angleImus', len(self.angleImus))
-        print('self.loadsX', len(self.loadsX))
-        print('self.loadsY', len(self.loadsY))
-        print('self.times', len(self.times))
-        
         
         
         if os.path.exists(d.USB_DATA_PATH):
@@ -313,9 +369,11 @@ class TestingView(v.View):
         self.itemFocusNum = num
 
     def setItemFocus(self, num):
-        self.items[self.itemFocusNum].setFocus(False)
+        if self.items[self.itemFocusNum] is not None:
+            self.items[self.itemFocusNum].setFocus(False)
         self.itemFocusNum = num
-        self.items[self.itemFocusNum].setFocus(True)
+        if self.items[self.itemFocusNum] is not None:
+            self.items[self.itemFocusNum].setFocus(True)
 
     def setPostItemFocusNum(self, num):
         self.postItemFocusNum = num
@@ -338,7 +396,14 @@ class TestingView(v.View):
         print('go to note setting')
         self.app.setView(nsv.NotesSettingView(self.app, self))
 
-
+    def setOperator(self):
+        self.app.setView(kbv.KeyboardView(self.app, self,
+                                      d.WORD,
+                                      'Device operator name',
+                                      'operator',
+                                      self.app.getSetting(d.OPERATOR)
+                                      ))
+        
     def toTestFolderSetting(self):
         self.app.setView(kbv.KeyboardView(self.app, self,
                                       d.WORD,
@@ -353,6 +418,9 @@ class TestingView(v.View):
             self.initPreTestInfoLayout()
         elif key == 'breakHeight':
             self.breakHeight = float(value)
+        elif key == 'operator':
+            self.app.saveSetting(d.OPERATOR, value)
+            self.initPreTestInfoLayout()
 
     def toPlotSetting(self):
         from views import plotSettingView as psv
@@ -403,14 +471,6 @@ class TestingView(v.View):
 #         self.app.hd.getAll()
         self.initButArea()
         
-        print('PRE TRUNCATE')
-        print('self.anglePots', len(self.anglePots))
-        print('self.angleImus', len(self.angleImus))
-        print('self.loadsX', len(self.loadsX))
-        print('self.loadsY', len(self.loadsY))
-        print('self.times', len(self.times))
-        
-        
         #truncate data
         min_len = min(len(self.anglePots), len(self.angleImus), len(self.loadsX), len(self.loadsY), len(self.times))
         trunc = lambda a,i: a[0:i] if len(a) > i else a
@@ -421,16 +481,7 @@ class TestingView(v.View):
         self.anglePots = trunc(self.anglePots, min_len)
         self.angleImus = trunc(self.angleImus, min_len)
         self.times = trunc(self.times, min_len)
-        
-        print('POST TRUNCATE')
-        print('self.anglePots', len(self.anglePots))
-        print('self.angleImus', len(self.angleImus))
-        print('self.loadsX', len(self.loadsX))
-        print('self.loadsY', len(self.loadsY))
-        print('self.times', len(self.times))
-
-
-        
+                
         
         if self.times.size > 0:
             self.times -= self.times[0]
@@ -541,12 +592,12 @@ class TestingView(v.View):
     def switchLoadMode(self):
         self.drawXY = not self.drawXY
         self.postItems[1].setValue('XY' if self.drawXY else 'F')
-        self.postItems[1].setTxt()        
+#         self.postItems[1].setText()        
         self.redrawGraph()
     def switchRotMode(self):
         self.drawPots = not self.drawPots
-        self.postItems[2].setValue('Pot.'if self.drawPots else 'IMU')
-        self.postItems[2].setTxt()        
+#         self.postItems[2].setValue('Pot.'if self.drawPots else 'IMU')
+        self.postItems[2].setValue('Pot.'if self.drawPots else 'IMU')        
         self.redrawGraph()
     
     def save(self):
@@ -587,7 +638,8 @@ class TestingView(v.View):
         self.butArea.display()
         if self.focusNum == preTest:
             for item in self.items:
-                item.display()
+                if item is not None:
+                    item.display()
         elif self.focusNum == inTest:
             self.inPrRect.display()
 #             self.simulateDataIn()
@@ -597,31 +649,55 @@ class TestingView(v.View):
                 item.display()
     def upArrowPress(self):
         if self.focusNum == preTest:
-            if (self.itemFocusNum>=2):
-                self.setItemFocus(self.itemFocusNum-2)
+            newI = (self.itemFocusNum - self.columns) % (self.columns * self.rows)
+            self.setItemFocus(newI)
+            if self.items[newI] is None:
+                self.upArrowPress()
+#             if (self.itemFocusNum>=3):
+#                 self.setItemFocus(self.itemFocusNum-3)
         elif self.focusNum == postTest:
             self.postItems[self.postItemFocusNum].upArrowPress()
     def downArrowPress(self):
         if self.focusNum == preTest:
-            if (self.itemFocusNum<len(self.items)-2):
-                self.setItemFocus(self.itemFocusNum+2)
+            newI = (self.itemFocusNum + self.columns) % (self.columns * self.rows)
+            self.setItemFocus(newI)            
+            if self.items[newI] is None:
+                self.downArrowPress()
+#             else:
+#                 self.setItemFocus(newI)
+#             if (self.itemFocusNum<len(self.items)-3):
+#                 self.setItemFocus(self.itemFocusNum+3)
         elif self.focusNum == postTest:
             self.postItems[self.postItemFocusNum].downArrowPress()
             
     def leftArrowPress(self):
         if self.focusNum == preTest:
-            if (self.itemFocusNum>0):
-                self.setItemFocus(self.itemFocusNum-1)
+            newI = (self.itemFocusNum - 1) % self.columns + (self.itemFocusNum // self.columns) * self.columns
+            self.setItemFocus(newI)
+            if self.items[newI] is None:
+                self.leftArrowPress()
+#             else:
+#                 self.setItemFocus(newI)
+
+#             if (self.itemFocusNum>0):
+#                 self.setItemFocus(self.itemFocusNum-1)
         elif self.focusNum == postTest:
             self.setPostItemFocus((self.postItemFocusNum-1)%3)
             pass
 
     def rightArrowPress(self):
         if self.focusNum == preTest:
-            if (self.itemFocusNum<len(self.items)-1):
-                self.setItemFocus(self.itemFocusNum+1)                
-            else:
-                self.leftArrowPress()
+            newI = (self.itemFocusNum + 1) % self.columns + (self.itemFocusNum // self.columns) * self.columns
+            self.setItemFocus(newI)
+            if self.items[newI] is None:
+                self.rightArrowPress()
+#             else:
+#                 self.setItemFocus(newI)
+
+#             if (self.itemFocusNum<len(self.items)-1):
+#                 self.setItemFocus(self.itemFocusNum+1)                
+#             else:
+#                 self.leftArrowPress()
         elif self.focusNum == postTest:
             self.setPostItemFocus((self.postItemFocusNum+1)%3)
             pass
@@ -662,58 +738,10 @@ class TestingView(v.View):
         self.ta = float(value)
     def fullStreamDataIn(self, anglePot, angleImu, forceValueX, forceValueY, timeValue):
         pass
-        #print('delta t', t.time() - self.lastDataIn, len(self.angles), len(self.loads), len(self.times))
-        #self.raspTimes.append(t.time())
-#         self.loadsX = np.append(self.loadsX, float(forceValueX))
-#         self.loadsY = np.append(self.loadsY, float(forceValueY))
-#         self.anglePots = np.append(self.anglePots, float(anglePot))
-#         self.angleImus = np.append(self.angleImus, float(angleImu))
-#         self.times = np.append(self.times, float(timeValue))
     def focusOn(self):
         self.initPreTestInfoLayout()
         super().focusOn()
         
-#     class SettingBtn:
-#         def __init__(self, app,geoData, metaData, focus, dim = (25*d.px, 18*d.py)):
-#             self.app = app
-#             self.disp = self.app.disp
-#             self.x = geoData['x']
-#             self.y = geoData['y']
-#             self.xdim = dim[0]
-#             self.ydim = dim[1]
-#             self.label = metaData['label']
-#             self.value = metaData['value']
-#             self.funct = metaData['funct']
-#             
-#             self.rl = rl.RectLabel(self.app,
-#                                    (self.x, self.y),
-#                                    (self.xdim, self.ydim),
-#                                    self.getLabel(),
-#                                    self.app.stnBtnFont,
-#                                    self.app.font_col,
-#                                    self.self.bcgCol
-#                                    )
-#             
-#             
-#             self.setFocus(focus)
-# 
-#         def setValue(self, value):
-#             self.value = value
-#             self.rl.setText(self.getLabel())
-#         def setFocus(self, focus):
-#             self.focus = focus
-#             self.setBcgCol()
-#         def getLabel(self):
-#             return self.label+ ': ' + str(self.value) + ('mm' if self.label == 'Height' else '')
-#         def setBcgCol(self):
-#             self.bcgCol = d.textView_highlight_col if self.focus else self.app.textView_col
-#             self.rl.setBcgCol(self.bcgCol)
-#         def display(self):
-#             self.rl.display()
-#         def upArrowPress(self):
-#             pass
-#         def downArrowPress(self):
-#             pass
     class NoteListWrapper:
         def __init__(self, app, disp, geoData, list = None, listName='', focus= False, metaData={}):
             self.app = app

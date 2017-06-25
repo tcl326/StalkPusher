@@ -109,7 +109,7 @@ class NoteList():
         self.endIndex = min(len(self.yNoteCents)-1, len(self.list)-1)
         
         self.itemsAvUplbl = rl.RectLabel(app = self.app,
-                                         pos = (self.x, self.y),
+                                         pos = (self.x, self.yNoteCents[0]- self.noteHeight - self.interNoteSpace),
                                          dim = (self.xdim, self.noteHeight),
                                          text = '...',
                                          font = self.app.nlFont

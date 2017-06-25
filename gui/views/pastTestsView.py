@@ -34,7 +34,7 @@ class PastTestsView(v.View):
         self.folderList.append(nl.NoteList(self.app, self.disp,{'x':self.cax-23*d.px,'y':self.cay, 'xdim':28*d.px, 'ydim': 50*d.py}, l,'Test folders', True))
         
         
-        l = self.getAllFiles(self.folderList[0].getItem())      
+        l = [fullName[0:-4] for fullName in self.getAllFiles(self.folderList[0].getItem())]     
         self.folderList.append(nl.NoteList(self.app, self.disp,{'x':self.cax+15*d.px,'y':self.cay, 'xdim':40*d.px, 'ydim': 50*d.py}, l,self.folderList[0].getItem()+' Test files', False))
         
 #         self.focus = 0

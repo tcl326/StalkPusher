@@ -7,7 +7,7 @@ from views import view as v
 from utils import text as txt
 from items import message as msg
 from items import viewBtn as vb
- 
+from views import keyboardView as kbv
 import os
 class SettingsView(v.View):
     def __init__(self, app, prevView = None):
@@ -29,6 +29,7 @@ class SettingsView(v.View):
 #             {'label': 'VOLUME', 'funct': self.toPendingSetting},
 #             {'label': 'GPS', 'funct': self.toPendingSetting},
             {'label': 'UPDATE', 'funct': self.checkUSB},
+            {'label': 'OPERATOR', 'funct': self.setOperator}
 #             {'label': 'ABOUT', 'funct': self.toPendingSetting},
         )
         self.numStnBtnRow = 2
@@ -85,6 +86,18 @@ class SettingsView(v.View):
                
     def toPendingSetting(self):
         pass
+    
+    def setOperator(self):
+        self.app.setView(kbv.KeyboardView(self.app, self,
+                                      d.WORD,
+                                      'Device operator name',
+                                      'operator',
+                                      self.app.getSetting(d.OPERATOR)
+                                      ))
+    def keyboardReturn(self, key, value, status = 1):
+        if key == 'operator':
+            self.app.saveSetting(d.OPERATOR, value)
+        
     def back(self):
         from views import mainView as mv
         print('go back')

@@ -24,9 +24,9 @@ class MainView(v.View):
             ]
 
         self.viewBtnDefs = (
-            {'label': 'TEMP', 'funct': self.getTemperature},
-            {'label': 'HUM', 'funct': self.getHumidity},
-            {'label': 'GEO', 'funct': self.getLocation},
+            {'label': 'TEMPERATURE', 'funct': self.getTemperature},
+            {'label': 'HUMIDITY', 'funct': self.getHumidity},
+            {'label': 'LOCATION', 'funct': self.getLocation},
             {'label': 'TIME', 'funct': self.getTime}
         )
 
@@ -35,7 +35,7 @@ class MainView(v.View):
         super().__init__(app)
 
         self.caTtlfont = pg.font.SysFont('Arial', int(6*d.px), bold = True)
-        self.caTtltxt = self.caTtlfont.render('STALK STRENGTH DEVICE ' + self.app.getSetting(d.VERSION), True, d.font_col_inv)
+        self.caTtltxt = 'STALK STRENGTH\nDEVICE ' + self.app.getSetting(d.VERSION)#self.caTtlfont.render('STALK STRENGTH DEVICE ' + self.app.getSetting(d.VERSION), True, d.font_col_inv)
 
         self.numViewBtnRow = 2
         self.numViewBtnCom = 2
@@ -56,12 +56,13 @@ class MainView(v.View):
             
             self.viewBtns.append(vb.ViewBtn(app = self.app,
                                      pos = (col,row),
-                                     dim = (30*d.px,18*d.py),
+                                     dim = (32*d.px,18*d.py),
                                      label = self.viewBtnDefs[i]['label'],
                                      value = 'N/A',
                                      funct = self.viewBtnDefs[i]['funct'],
                                      focus = False,
-                                     formating = lambda lab, val: lab+ ': ' + str(val)
+                                     formating = lambda lab, val: lab+ ':\n' + str(val)#,
+#                                      txtMode = 'mpte'
                                      )
                                  )
                                      
@@ -70,10 +71,19 @@ class MainView(v.View):
     def select(self):
         self.app.hd.getAll()
 
-    
+    def focusOn(self):
+        super().focusOn()
+        self.app.hd.getAll()
     def displayView(self):
         #display title for context area
-        self.disp.blit(self.caTtltxt, (self.caTtltxt.get_rect(center=(self.cax, self.cay))))
+        txt.mpue(disp = self.disp,
+                 text = self.caTtltxt,
+                 pos = (self.cax, self.cay - 5*d.py),
+                 height = 25*d.py,
+                 font = self.caTtlfont,
+                 fontCol = d.invertColor(self.app.bcg_col)
+                 )
+#         self.disp.blit(self.caTtltxt, (self.caTtltxt.get_rect(center=(self.cax, self.cay))))
         for viewBtn in self.viewBtns:
             viewBtn.display()
         
@@ -125,16 +135,16 @@ class MainView(v.View):
         next((x for x in self.viewBtns if x.label == 'TIME'), None).setValue(value)
     def locationIn(self, x, y):
         super().locationIn(x, y)
-        next((x for x in self.viewBtns if x.label == 'GEO'), None).setValue((x, y))
+        next((x for x in self.viewBtns if x.label == 'LOCATION'), None).setValue((x, y))
     def noGPS(self):
         super().noGPS()
-        next((x for x in self.viewBtns if x.label == 'GEO'), None).setValue('No GPS')        
+        next((x for x in self.viewBtns if x.label == 'LOCATION'), None).setValue('No GPS')        
     def temperatureIn(self, value):
         super().temperatureIn(value)
-        next((x for x in self.viewBtns if x.label == 'TEMP'), None).setValue(value)
+        next((x for x in self.viewBtns if x.label == 'TEMPERATURE'), None).setValue(str(value))
     def humidityIn(self, value):
         super().humidityIn(value)
-        next((x for x in self.viewBtns if x.label == 'HUM'), None).setValue(value)
+        next((x for x in self.viewBtns if x.label == 'HUMIDITY'), None).setValue(value)
 #     def connectionEstablished(self):
 #         print('main: established conn')
 #         self.getAll()
@@ -195,38 +205,12 @@ class MainView(v.View):
         from items import message as ms
         self.pushMsg(ms.Message(self.app, self, self.disp,
                                 'EXITING',
-                                'Choose exit mode. You are about to exit. Just saying. So you will be exiting after you click yes so think about it very hard cause that might bring some unwanted consequences I think. One final word... this is very long.',
+                                'Choose exit mode.',# You are about to exit. Just saying. So you will be exiting after you click yes so think about it very hard cause that might bring some unwanted consequences I think. One final word... this is very long.',
                                 btnDefs = (
+                                    {'label': 'CANCEL', 'id': 'cancelBtn', 'funct': self.popMsg},
                                     {'label': 'EXIT', 'id': 'exitBtn', 'funct': self.bringExitMsg},
                                     {'label': 'RESTART', 'id': 'restartBtn', 'funct': self.bringRestartMsg},
                                     {'label': 'SHUT\nDOWN', 'id': 'shutdownBtn', 'funct': self.bringShutdownMsg},
-                                    {'label': 'CANCEL', 'id': 'cancelBtn', 'funct': self.popMsg}
-                                )
-                                )
-                     )
-    def bringShutdownMsg(self):
-        from items import message as ms
-        self.pushMsg(ms.Message(self.app, self, self.disp,
-                                'SHUTTING DOWN DEVICE...',
-                                'ARE YOU SURE?',
-                                btnDefs = (
-                                    {'label': 'YES', 'id': 'yesBtn', 'funct': self.app.shutdownPi},
-                                    {'label': 'NO', 'id': 'noBtn', 'funct': self.popMsg},
-                                    {},
-                                    {}
-                                )
-                                )
-                     )
-    def bringExitMsg(self):
-        from items import message as ms
-        self.pushMsg(ms.Message(self.app, self, self.disp,
-                                'EXITING SOFTWARE',
-                                'ARE YOU SURE?',
-                                btnDefs = (
-                                    {'label': 'YES', 'id': 'yesBtn', 'funct': self.app.exit},
-                                    {'label': 'NO', 'id': 'noBtn', 'funct': self.popMsg},
-                                    {},
-                                    {}
                                 )
                                 )
                      )

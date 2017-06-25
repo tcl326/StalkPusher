@@ -4,7 +4,7 @@ from views import view as v
 from main import defs as d
 from items import message as msg
 from views import keyboardView as kbv
-
+from utils import dateParse as dp
 class EditSensorView(v.View):
     def __init__(self, app, sensorType, sensorName, prevView = None):
         self.title = 'EDIT ' + sensorName +' SENSOR'
@@ -19,12 +19,13 @@ class EditSensorView(v.View):
         super().__init__(app, prevView)
         self.sensorType = sensorType
         self.sensorName = sensorName
+        
         self.sensorData = self.app.getSetting(d.SENSOR_BANK)[self.sensorType][self.sensorName]
         
         self.numBtnX = self.cax
         self.numBtnY = self.cay
         self.initLists()
-        
+        self.app.hd.getAll()
     def initLists(self):
         self.nls = []
         
@@ -40,6 +41,21 @@ class EditSensorView(v.View):
     def editField(self):
         fieldType = self.nls[0].getItem()
         input = self.nls[1].getItem()
+        if fieldType == d.SENSOR_LAST:
+            self.pushMsg(msg.Message(self.app, self, self.disp,
+                                    'Non-editable field.',
+                                    'This field is automatically updated when you introduce and save any changes to the sensor. The '\
+                                    'current time, ' + dp.DateParse(self.app.getEnvData(d.TIME)).getDateTime() + ' will populate this field if you save this sensor.',
+                                    btnDefs = (
+                                        {'label': 'OK', 'id': 'yesBtn', 'funct': self.popMsg},
+                                        {},
+                                        {},
+                                        {}
+                                    )
+                                    )
+                         )
+            return
+            
         if fieldType == d.SENSOR_A or fieldType == d.SENSOR_B:
             kbType = d.NUM
         else:
@@ -60,7 +76,7 @@ class EditSensorView(v.View):
             except:
                 self.pushMsg(msg.Message(self.app, self, self.disp,
                                         'Invalid data',
-                                        'Input mst b a valid numerical value. Retry',
+                                        'Input must be a valid numerical value. Retry',
                                         btnDefs = (
                                             {'label': 'OK', 'id': 'yesBtn', 'funct': self.popMsg},
                                             {'label': 'RETRY', 'id': 'yesBtn', 'funct': self.popMsg},
@@ -73,6 +89,7 @@ class EditSensorView(v.View):
     def saveSensor(self):
         #make it more efficient - access only needed data fields
         #I assume that sensorData is being changed every time a field is changed
+        self.sensorData[d.SENSOR_LAST] = dp.DateParse(self.app.getEnvData(d.TIME)).getDateTime()
         allSensors = self.app.getSetting(d.SENSOR_BANK)
         allSensors[self.sensorType][self.sensorName] = self.sensorData
         self.app.saveSetting(d.SENSOR_BANK, allSensors)
@@ -80,7 +97,7 @@ class EditSensorView(v.View):
         
     def replaceList(self, fieldType):
         l = [self.sensorData[fieldType]]
-        self.nls[1] = (nl.NoteList(self.app, self.disp,{'x':self.cax+20*d.px,'y':self.cay, 'xdim':28*d.px, 'ydim': 50*d.py}, l, self.sensorName + ' sensors', False))
+        self.nls[1] = (nl.NoteList(self.app, self.disp,{'x':self.cax+16*d.px,'y':self.cay, 'xdim':34*d.px, 'ydim': 50*d.py}, l, self.nls[0].getItem(), False))
         
         
     def getAllSensors(self, sensorType):

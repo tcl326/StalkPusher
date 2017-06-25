@@ -61,6 +61,8 @@ class CropDevMain:
         self.btnFont = pg.font.SysFont('Arial', d.BTN_FS, True)
         self.viewTtlFont = pg.font.SysFont('Arial', d.VIEW_TTL_FS, True)
         self.nlFont = pg.font.SysFont('Arial', d.NL_FS, True)
+        self.lvVbFONT = pg.font.SysFont('Arial', d.LV_VB_FS, True)
+
         self.stnBtnFont = pg.font.SysFont('Arial', d.STN_BTN_FS, True)
         self.msgTtlFont = pg.font.SysFont('Arial', d.MSG_TTL_FS, True)
         self.msgBdFont = pg.font.SysFont('Arial', d.MSG_BD_FS, True)
@@ -99,13 +101,14 @@ class CropDevMain:
         fileData = d.readSettings()
         self.data = {}
         for DATA_STRING in d.dataStrings:
-            self.data[DATA_STRING] = fileData[DATA_STRING]
+            try:
+                self.data[DATA_STRING] = fileData[DATA_STRING]
+            except:
+                self.data[DATA_STRING] = 'N/A'
+                
         self.bcg_col = tuple(self.data[d.COLORS]['bcg_col'])
         self.textView_col = tuple(self.data[d.COLORS]['textView_col'])
-        self.font_col = tuple(self.data[d.COLORS]['font_col'])
-        
-        print(self.bcg_col , self.textView_col, self.font_col)
-        
+        self.font_col = tuple(self.data[d.COLORS]['font_col'])        
         
     def getSetting(self, setting):
         return self.data[setting]

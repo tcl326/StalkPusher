@@ -12,9 +12,12 @@ class ViewBtn:
                  dim,
                  label,
                  value = '',
+                 id = '',
+                 font = None,
                  funct = None,
                  focus = False,
-                 formating = lambda lab, val :lab
+                 formating = lambda lab, val :lab,
+                 txtMode = 'mpte'
                 ):
         self.app = app
         self.disp = self.app.disp
@@ -28,18 +31,22 @@ class ViewBtn:
         #meta data
         self.label = label
         self.value = value
+        self.id = id
         self.funct = funct
         
         self.focus = focus
         
         self.formating = formating
         
+        self.txtMode = txtMode
+        
         self.rl = rl.RectLabel(app=self.app,
                                pos=(self.x, self.y),
                                dim=(self.xdim, self.ydim),
                                text=self.formating(self.label, self.value),
-                               font=self.app.stnBtnFont,
+                               font = font if font is not None else self.app.stnBtnFont,
                                bcgCol=d.textView_highlight_col if self.focus else self.app.textView_col,
+                               txtMode = self.txtMode
                                )
         
     def setValue(self, value):
@@ -49,9 +56,11 @@ class ViewBtn:
     def setFocus(self, focus):
         self.focus = focus
         self.rl.setBcgCol(d.textView_highlight_col if self.focus else self.app.textView_col)
-        
-    def makeRlText(self):
-        return self.label+ ': ' + str(self.value)
+
+    def getValue(self):
+        return self.value
+#     def makeRlText(self):
+#         return self.label+ ': ' + str(self.value)
     
     def display(self):
         self.rl.display()

@@ -4,7 +4,7 @@ from views import view as v
 from main import defs as d
 from views import keyboardView as kbv
 from items import message as msg
-
+from utils import dateParse as dp
 class SensorSettingView(v.View):
     def __init__(self, app, prevView = None):
         self.title = 'SENSORS MANAGER'
@@ -47,6 +47,7 @@ class SensorSettingView(v.View):
             
     def addSensor(self):
         self.popMsg()
+        self.app.hd.getAll()
         self.newSensor = {}
         self.newSensor['sensorType'] = self.nls[0].getItem()
         self.app.setView(kbv.KeyboardView(self.app, self,
@@ -79,6 +80,8 @@ class SensorSettingView(v.View):
                                                      ))
         elif key == 'sensorUnit':
             self.saveAddedSensor()
+            from views import editSensorView as esv
+            self.app.setView(esv.EditSensorView(self.app, self.newSensor['sensorType'], self.newSensor['sensorName'], self))
 
 
 
@@ -86,7 +89,7 @@ class SensorSettingView(v.View):
         newSensorData = {d.SENSOR_UNIT: self.newSensor['sensorUnit'],
                       d.SENSOR_A: 'NaN',
                       d.SENSOR_B: 'NaN',
-                      d.SENSOR_LAST: '2017'}
+                      d.SENSOR_LAST: dp.DateParse(self.app.getEnvData(d.TIME)).getDateTime()}
         sensorBank = self.app.getSetting(d.SENSOR_BANK)
         sensorBank[self.newSensor['sensorType']][self.newSensor['sensorName']] = newSensorData
         self.app.saveSetting(d.SENSOR_BANK, sensorBank)
@@ -151,7 +154,9 @@ class SensorSettingView(v.View):
         sensorBank = self.app.getSetting(d.SENSOR_BANK)
         del sensorBank[self.nls[0].getItem()][self.nls[1].getItem()]
         self.app.saveSetting(d.SENSOR_BANK, sensorBank)
+        self.setFocus(not self.focusNum)        
         self.initLists()
+        self.initButArea()
              
     def toEditView(self):
         self.popMsg()
@@ -190,7 +195,12 @@ class SensorSettingView(v.View):
                 
     def getAllSensors(self, sensorType):
         return list(self.sensorBankData[sensorType])
-        
+
+    def setFocus(self, focusNum):
+        self.nls[self.focusNum].setFocus(False)
+        self.focusNum = focusNum
+        self.nls[self.focusNum].setFocus(True)
+                
     def upArrowPress(self):
         self.nls[self.focusNum].upArrowPress()
         if self.focusNum ==0:
@@ -200,17 +210,12 @@ class SensorSettingView(v.View):
         if self.focusNum ==0:
             self.replaceList(self.nls[0].getItem())
     def leftArrowPress(self):
-
-        self.nls[self.focusNum].setFocus(False)
-        self.focusNum = not self.focusNum
-        self.nls[self.focusNum].setFocus(True)
+        self.setFocus(not self.focusNum)
         self.initButArea()
 
     def rightArrowPress(self):
 
-        self.nls[self.focusNum].setFocus(False)
-        self.focusNum = not self.focusNum
-        self.nls[self.focusNum].setFocus(True)
+        self.setFocus(not self.focusNum)
         self.initButArea()
 
     def displayView(self):

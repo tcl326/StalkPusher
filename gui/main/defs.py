@@ -31,7 +31,17 @@ def saveSetting(setting, value):
         data_file.seek(0)
         json.dump(data, data_file,indent=4)
         data_file.truncate()
-
+#for parsing date
+TIME_DEL = '_'
+HOUR_DEL = ':'
+MILLIS_DEL = '.'
+#constant units (for saving to file, mainly)
+HEIGHT_UNIT = 'cm'
+TIME_UNIT = 'UTC'
+PLOT_UNIT = '#'
+GPS_UNIT = 'angular degrees'
+#default test name
+TEST_FILE_NAME = 'test'
 # if __name__ == "__main__":
 #critical paths
 APP_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))#../gui/
@@ -48,7 +58,7 @@ setting_file_path = MAINAPP_PATH + '/appData.json'
 # Screen Geometry
 #in pixels
 pg.init()
-FULLSCREEN = 1
+FULLSCREEN =0
 infoObject = pg.display.Info()
 width = infoObject.current_w
 height = infoObject.current_h
@@ -99,11 +109,12 @@ btnAreaGeo = [{'x':12.5*px,'y':12.5*py,'xdim':btnXdim-2*xMargin,'ydim':btnYdim-2
 
 #Default font sizes, some change dynamically.
 BTN_FS = int(3.8*px)
-VIEW_TTL_FS = int(3.8*px)
-NL_FS = int(3.8*px)
+VIEW_TTL_FS = int(6*px)
+NL_FS = int(3.6*px)
+LV_VB_FS = int(3.2*px)
 STN_BTN_FS = int(3.8*px)
-MSG_TTL_FS = int(3.8*px)
-MSG_BD_FS = int(3.8*px)
+MSG_TTL_FS = int(4.4*px)
+MSG_BD_FS = int(3.4*px)
 KB_KEY_FS = int(3.8*px)
 NK_FS = int(4*px)
 
@@ -120,6 +131,7 @@ COLORS = 'colors'
 DATA_CONFIRM_FREQ = 'dataConfirmFreq'
 MAX_START_ANGLE = 'maxStartAngle'
 VERSION = 'version'
+OPERATOR = 'operator'
 #sensor types data strings
 DS_LOAD_X = 'LOAD_X'
 DS_LOAD_Y = 'LOAD_Y'
@@ -135,10 +147,11 @@ SENSOR_B = 'b'
 SENSOR_LAST = 'last'
 
 SENSOR_FIELDS = [SENSOR_UNIT, SENSOR_A, SENSOR_B, SENSOR_LAST]
+#    "operator": "witold",
 
 dataStrings = [TEST_HEIGHT, TEST_PLOT, PRE_TEST_NOTES, POST_TEST_NOTES,
                 NOTE_BANK, TEST_FOLDER, SENSORS, SENSOR_BANK,
-                 COLORS, DATA_CONFIRM_FREQ, MAX_START_ANGLE, VERSION]
+                 COLORS, DATA_CONFIRM_FREQ, MAX_START_ANGLE, VERSION, OPERATOR]
 #Sensors
 sensorDataStrings = [DS_LOAD_X, DS_LOAD_Y, DS_IMU, DS_POT, DS_TEMP, DS_HUM]
 
@@ -162,7 +175,7 @@ WORD = 'WORD'
 
 MAX_NOTES = 5 #max notes per test
 
-
+CALIB_AV_T = 2# sampling period for calibration in seconds
 #default colors
 bcg_col_d = black
 font_col_d = black

@@ -9,7 +9,7 @@ import defs as d
 from utils import text as txt
 
 class RectLabel:
-    def __init__(self, app, pos, dim, text, font, fontCol = 0, bcgCol = 0, txtMode = 'spt', scaleFactor = 1.0):
+    def __init__(self, app, pos, dim, text, font, fontCol = 0, bcgCol = 0, txtMode = 'mpte', scaleFactor = 1.0):
         self.app = app
         self.disp = self.app.disp
         self.x = pos[0]
@@ -93,5 +93,13 @@ class RectLabel:
                     (self.xdim * self.scaleFactor, self.ydim * self.scaleFactor),
                     self.font,
                     self.fontCol)
+
+        elif self.txtMode == 'mpte':
+            txt.mpte(disp = self.disp,
+                    text = self.text,
+                    pos = (x, y),
+                    dim = (self.xdim * self.scaleFactor, self.ydim * self.scaleFactor),
+                    font = self.font,
+                    fontCol = self.fontCol)
             
         

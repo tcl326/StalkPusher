@@ -157,7 +157,7 @@ class HardWare:
                 #check if acknowledgement
                 if re.match(ACK_COMM, ard_input) != None:        #check if dataIn
                     #we have an acknowledgement
-                    print('ACKNOWLEDGEMENT: |' + ard_input + '|', t.time())                    
+                    print('ACKNOWLEDGEMENT: |' + ard_input + '|')                    
                     ack_comm = re.findall(ACK_COMM, ard_input)[0]
                     self.parseAck(ack_comm)
                 elif re.match(DATA_IN_COMM, ard_input) != None:
@@ -293,15 +293,12 @@ class HardWare:
         command = STOP+'0000'
         self.sendCommand(command)
     def sendCommand(self, command):
-        print('writing command to arduino', t.time(), 'we have that many bytes', self.arduino.inWaiting())
         ardCommand = START_CHAR+command+END_CHAR
-        self.writeToArd(ardCommand)
-        print('finished writing command to arduino', t.time(), 'we have that many bytes', self.arduino.inWaiting())
 
-#         cmdThread = thr.Thread(target = self.writeToArd, args = (ardCommand,))
-#         cmdThread.setName('SEND COMMAND THREAD')
-#         cmdThread.daemon = True
-#         cmdThread.start()
+        cmdThread = thr.Thread(target = self.writeToArd, args = (ardCommand,))
+        cmdThread.setName('SEND COMMAND THREAD')
+        cmdThread.daemon = True
+        cmdThread.start()
         #self.writeToArd(ardCommand)
     def writeToArd(self, comm):
         with self.threadLock:

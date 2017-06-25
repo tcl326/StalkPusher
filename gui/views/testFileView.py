@@ -13,7 +13,7 @@ from items import noteList as nl
 from items import rectLabel as rl
 from utils import text as txt
 from utils import postProcess as pp
-
+from items import viewBtn as vb
 class TestFileView(v.View):
     def __init__(self, app, path, prevView = None):
         splitPath = path.split('/')
@@ -48,18 +48,39 @@ class TestFileView(v.View):
 
     def initLayout(self):
         self.setPostItemFocusNum(0)
-        self.postStnBtnDefs = (
-            {'label': 'Load', 'value': 'F','funct': self.switchLoadMode},
-            {'label': 'Rotation', 'value': 'IMU','funct': self.switchRotMode}
-        )
+#         self.postStnBtnDefs = (
+#             {'label': 'Load', 'value': 'F','funct': self.switchLoadMode},
+#             {'label': 'Rotation', 'value': 'IMU','funct': self.switchRotMode}
+#         )
         self.postItems = []
         
         #self.postItems.append(nl.NoteList(self.app, self.disp,{'x':self.cax-28*d.px,'y':self.cay, 'xdim':20*d.px, 'ydim': 25*d.py}, listName = 'postTestNotes', hasFocus = True))
         
-        self.postItems.append(self.SettingBtn(self.app, {'x': self.cax-10*d.px, 'y': self.cay + 40 * d.py},
-                                          self.postStnBtnDefs[0], True,  (15 * d.px, 10*d.py)))
-        self.postItems.append(self.SettingBtn(self.app, {'x': self.cax+10*d.px, 'y': self.cay + 40 * d.py},
-                                  self.postStnBtnDefs[1], False, (15 * d.px, 10*d.py)))
+        self.postItems.append(vb.ViewBtn(app = self.app,
+                                    pos = (self.cax-4*d.px, self.cay + 42 * d.py),
+                                    dim = (22 * d.px, 12*d.py),
+                                    label = 'Load',
+                                    value = 'F',
+                                    funct = self.switchLoadMode,
+                                    focus = False,
+                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    )
+                          )
+
+        self.postItems.append(vb.ViewBtn(app = self.app,
+                                    pos = (self.cax+22*d.px, self.cay + 42 * d.py),
+                                    dim = (22 * d.px, 12*d.py),
+                                    label = 'Rot.',
+                                    value = 'IMU',
+                                    funct = self.switchRotMode,
+                                    focus = False,
+                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    )
+                          )
+#         self.postItems.append(self.SettingBtn(self.app, {'x': self.cax-10*d.px, 'y': self.cay + 40 * d.py},
+#                                           self.postStnBtnDefs[0], True,  (15 * d.px, 10*d.py)))
+#         self.postItems.append(self.SettingBtn(self.app, {'x': self.cax+10*d.px, 'y': self.cay + 40 * d.py},
+#                                   self.postStnBtnDefs[1], False, (15 * d.px, 10*d.py)))
 
     def readVectors(self):
         
@@ -188,47 +209,47 @@ class TestFileView(v.View):
     def rightArrowPress(self):
             self.setPostItemFocus((self.postItemFocusNum+1)%len(self.postItems))
         
-    class SettingBtn:
-        def __init__(self, app,geoData, metaData, focus, dim = (25*d.px, 18*d.py)):
-            self.app = app
-            self.disp = self.app.disp
-            self.x = geoData['x']
-            self.y = geoData['y']
-            self.xdim = dim[0]
-            self.ydim = dim[1]
-            self.label = metaData['label']
-            self.value = metaData['value']
-            self.funct = metaData['funct']
-            self.setFocus(focus)
-            self.txtDim = txt.findFontSize(self.label+ ': ' + str(self.value), 'Arial', self.xdim, self.ydim)
-
-            self.setFontCol()
-
-            self.setFont()
-
-            self.setTxt()
-        def setValue(self, value):
-            self.value = value
-        def setFocus(self, focus):
-            self.focus = focus
-            self.setBcgCol()
-
-        def setTxt(self):
-            self.txt = self.font.render(self.label+ ': ' + str(self.value) + ('mm' if self.label == 'Height' else ''), True, self.fontCol)
-        def setFont(self):
-            self.font = pg.font.SysFont('Arial', self.txtDim, bold = True)
-        def setBcgCol(self):
-            self.bcgCol = d.textView_highlight_col if self.focus else self.app.textView_col
-        def setFontCol(self):
-            self.fontCol = self.app.font_col
-
-        def display(self):
-            # display rect
-            pg.draw.rect(self.disp, self.bcgCol, (self.x - self.xdim / 2, self.y - self.ydim / 2, self.xdim, self.ydim))
-            #display number
-            self.disp.blit(self.txt, (self.txt.get_rect(center=(self.x, self.y))))
-        def upArrowPress(self):
-            pass
-        def downArrowPress(self):
-            pass
+#     class SettingBtn:
+#         def __init__(self, app,geoData, metaData, focus, dim = (25*d.px, 18*d.py)):
+#             self.app = app
+#             self.disp = self.app.disp
+#             self.x = geoData['x']
+#             self.y = geoData['y']
+#             self.xdim = dim[0]
+#             self.ydim = dim[1]
+#             self.label = metaData['label']
+#             self.value = metaData['value']
+#             self.funct = metaData['funct']
+#             self.setFocus(focus)
+#             self.txtDim = txt.findFontSize(self.label+ ': ' + str(self.value), 'Arial', self.xdim, self.ydim)
+# 
+#             self.setFontCol()
+# 
+#             self.setFont()
+# 
+#             self.setTxt()
+#         def setValue(self, value):
+#             self.value = value
+#         def setFocus(self, focus):
+#             self.focus = focus
+#             self.setBcgCol()
+# 
+#         def setTxt(self):
+#             self.txt = self.font.render(self.label+ ': ' + str(self.value) + ('mm' if self.label == 'Height' else ''), True, self.fontCol)
+#         def setFont(self):
+#             self.font = pg.font.SysFont('Arial', self.txtDim, bold = True)
+#         def setBcgCol(self):
+#             self.bcgCol = d.textView_highlight_col if self.focus else self.app.textView_col
+#         def setFontCol(self):
+#             self.fontCol = self.app.font_col
+# 
+#         def display(self):
+#             # display rect
+#             pg.draw.rect(self.disp, self.bcgCol, (self.x - self.xdim / 2, self.y - self.ydim / 2, self.xdim, self.ydim))
+#             #display number
+#             self.disp.blit(self.txt, (self.txt.get_rect(center=(self.x, self.y))))
+#         def upArrowPress(self):
+#             pass
+#         def downArrowPress(self):
+#             pass
 

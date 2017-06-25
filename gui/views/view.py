@@ -19,7 +19,6 @@ from hardware import hdInterface2 as hd
 from utils import text as txt
 from items import viewBtn as vb
 
-TIME_DEL = '_'
 class View(object):
     def __init__(self, app, prevView = None):
 
@@ -103,11 +102,12 @@ class View(object):
         return value
     def display(self):
         
-        txt.spu(self.disp,
-                self.title,
-                (self.cax, 5*d.py),
-                self.app.viewTtlFont,
-                d.invertColor(self.app.bcg_col)
+        txt.spt(disp = self.disp,
+                text = self.title,
+                pos = (self.cax, 5*d.py),
+                width = self.caxdim,
+                font = self.app.viewTtlFont,
+                fontCol = d.invertColor(self.app.bcg_col)
                 )
         
 #         self.disp.blit(self.titleTxt, (self.titleTxt.get_rect(center=(self.cax, self.cay- 3*d.py-self.caydim/2+self.titleTxt.get_height()))))
@@ -182,7 +182,12 @@ class View(object):
         sensor = sensorBank[sensorType][sensorName]
         return(sensor[d.SENSOR_A], sensor[d.SENSOR_B])
     
-    #overriden
+    def getUnit(self, sensorType):
+        sensorName = self.app.getSetting(d.SENSORS)[sensorType]
+        sensorBank = self.app.getSetting(d.SENSOR_BANK)
+        sensor = sensorBank[sensorType][sensorName]
+        return sensor[d.SENSOR_UNIT]
+    
     def getABUnit(self, sensorType):
         sensorName = self.app.getSetting(d.SENSORS)[sensorType]
         sensorBank = self.app.getSetting(d.SENSOR_BANK)
@@ -191,7 +196,7 @@ class View(object):
     
     #sensorCallbacks
     def timeIn(self, year, month, day, hour, minute, second, millis):
-        self.app.saveEnvData(d.TIME, year + TIME_DEL + month + TIME_DEL + day + TIME_DEL + hour + TIME_DEL + minute + TIME_DEL + second)
+        self.app.saveEnvData(d.TIME, year + d.TIME_DEL + month + d.TIME_DEL + day + d.TIME_DEL + hour + d.TIME_DEL + minute + d.TIME_DEL + second)
     def locationIn(self, x, y):
         self.app.saveEnvData(d.LOCATION, str(x) + '|' + str(y))
     def noGPS(self):
@@ -266,6 +271,34 @@ class View(object):
                                 )
                                 )
                      )
+        
+    def bringShutdownMsg(self):
+        from items import message as ms
+        self.pushMsg(ms.Message(self.app, self, self.disp,
+                                'SHUTTING DOWN DEVICE...',
+                                'ARE YOU SURE?',
+                                btnDefs = (
+                                    {'label': 'NO', 'id': 'noBtn', 'funct': self.popMsg},
+                                    {},
+                                    {},
+                                    {'label': 'YES', 'id': 'yesBtn', 'funct': self.app.shutdownPi}
+                                )
+                                )
+                     )
+    def bringExitMsg(self):
+        from items import message as ms
+        self.pushMsg(ms.Message(self.app, self, self.disp,
+                                'EXITING SOFTWARE',
+                                'ARE YOU SURE?',
+                                btnDefs = (
+                                    {'label': 'YES', 'id': 'yesBtn', 'funct': self.app.exit},
+                                    {'label': 'NO', 'id': 'noBtn', 'funct': self.popMsg},
+                                    {},
+                                    {}
+                                )
+                                )
+                     )
+        
     def retrySerialConn(self):
         self.popMsg()
         self.app.hd.initConnThread()

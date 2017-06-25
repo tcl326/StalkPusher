@@ -1,70 +1,6 @@
 {
-    "testFolder": "NEW",
-    "maxStartAngle": 5,
-    "testPlot": 41346,
-    "noteBank": [
-        "DDDER"
-    ],
-    "preTestNotes": [
-        "XDSDXZ",
-        "Q"
-    ],
-    "version": "1.0.3",
-    "sensorBank": {
-        "TEMP": {
-            "temp1": {
-                "last": "2017-05-20,10:43",
-                "a": 1.0,
-                "unit": "C",
-                "b": 0.0
-            }
-        },
-        "HUM": {
-            "hum1": {
-                "last": "2017-05-20,10:43",
-                "a": 1.0,
-                "unit": "%",
-                "b": 0.0
-            }
-        },
-        "IMU": {
-            "imu1": {
-                "last": "2017-05-20,10:43",
-                "a": 1.0,
-                "unit": "Deg",
-                "b": 0.0
-            }
-        },
-        "POT": {
-            "pot1": {
-                "last": "2017-05-20,10:43",
-                "a": 5400.0,
-                "unit": "Deg",
-                "b": 0.0
-            }
-        },
-        "LOAD_X": {
-            "loadx1": {
-                "last": "2017-05-20,10:43",
-                "a": -120.0,
-                "unit": "N",
-                "b": 0.0
-            }
-        },
-        "LOAD_Y": {
-            "loady1": {
-                "last": "2017-05-20,10:43",
-                "a": -120.0,
-                "unit": "N",
-                "b": 0.0
-            }
-        }
-    },
-    "testHeight": 120,
     "dataConfirmFreq": 200,
-    "postTestNotes": [
-        "1WWE"
-    ],
+    "operator": "CHRISTOPHER",
     "colors": {
         "textView_col": [
             255,
@@ -72,7 +8,7 @@
             255
         ],
         "font_col": [
-            127,
+            0,
             0,
             0
         ],
@@ -82,12 +18,81 @@
             0
         ]
     },
+    "version": "1.0.3",
+    "maxStartAngle": 5,
+    "preTestNotes": [
+        "KUY65",
+        "ZX12",
+        "XDSDXZ",
+        "Q"
+    ],
+    "sensorBank": {
+        "LOAD_Y": {
+            "loady1": {
+                "b": 0.0,
+                "last": "2017_6_25_12:29:51",
+                "unit": "N",
+                "a": -120.0
+            }
+        },
+        "IMU": {
+            "imu1": {
+                "b": 0.0,
+                "last": "2017_6_25_12:29:46",
+                "unit": "Deg",
+                "a": 1.0
+            }
+        },
+        "HUM": {
+            "hum1": {
+                "b": 0.0,
+                "last": "2017_6_25_12:29:10",
+                "unit": "%",
+                "a": 1.0
+            }
+        },
+        "TEMP": {
+            "temp1": {
+                "b": 0.0,
+                "last": "2017_6_25_12:29:20",
+                "unit": "C",
+                "a": 1.0
+            }
+        },
+        "POT": {
+            "pot1": {
+                "b": 0.0,
+                "last": "2017_6_25_12:29:34",
+                "unit": "Deg",
+                "a": 5400.0
+            }
+        },
+        "LOAD_X": {
+            "loadx1": {
+                "b": 0.0,
+                "last": "2017_6_25_12:30:6",
+                "unit": "N",
+                "a": -120.0
+            }
+        }
+    },
+    "noteBank": [
+        "WQQWDX",
+        "DDDER"
+    ],
+    "testPlot": 41346,
+    "testHeight": 120,
+    "testFolder": "NEW4",
     "sensors": {
-        "TEMP": "temp1",
-        "HUM": "hum1",
+        "LOAD_Y": "loady1",
         "IMU": "imu1",
-        "POT": "pot1",
+        "HUM": "hum1",
+        "TEMP": "temp1",
         "LOAD_X": "loadx1",
-        "LOAD_Y": "loady1"
-    }
+        "POT": "pot1"
+    },
+    "postTestNotes": [
+        "WDSEEW",
+        "1WWE"
+    ]
 }
