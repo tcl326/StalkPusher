@@ -9,7 +9,6 @@ from items import message as msg
 from views import keyboardView as kbv
 from items import rectLabel as rl
 from items import viewBtn as vb
-from utils import dateParse as dp
 import threading as thr
 import time as t
 ADC = 'ADC'
@@ -75,7 +74,7 @@ class CalibrationView(v.View):
         
         self.infoBtnsCols = (self.cax - self.caxdim/2 + 1*self.caxdim/8, self.cax - self.caxdim/2 + 3*self.caxdim/8,
                              self.cax - self.caxdim/2 + 5*self.caxdim/8, self.cax - self.caxdim/2 + 7*self.caxdim/8)
-        self.infoBtnsRows = [self.cay + 42*d.py]
+        self.infoBtnsRows = [self.cay + 35*d.py]
 
         self.numInfoBtnRow = len(self.infoBtnsRows)
         self.numInfoBtnCom = len(self.infoBtnsCols)
@@ -84,7 +83,7 @@ class CalibrationView(v.View):
             col = self.infoBtnsCols[i % self.numInfoBtnCom]
             self.infoBtns.append(vb.ViewBtn(app = self.app,
                                             pos = (col, row),
-                                            dim = (16*d.px, 14*d.py),
+                                            dim = (16*d.px, 15*d.py),
                                             label = self.infoBtnDefs[i]['label'],
                                             value = self.infoBtnDefs[i]['value'],
                                             id = self.infoBtnDefs[i]['id'],
@@ -103,16 +102,12 @@ class CalibrationView(v.View):
                              scaleFactor = 0.7
                              )#in progress rectangle
 
-        self.graph = self.app.testingView.graph
-        self.graph.updatePlot(                    
-                    xlabel = 'REAL ' + self.sensorType + ' [' + self.sensorData['unit'] + ']',
-                    ylabel = self.sensorType + ' ADC'
-)
-#         self.startGraph()
-#     def startGraph(self):
-#         self.graph = g.Graph(self.disp, {'x':self.cax+10*d.px, 'y':self.cay-8*d.py, 'xdim': 50, 'ydim':63})
+        self.startGraph()
+    def startGraph(self):
+        self.graph = g.Graph(self.disp, {'x':self.cax+10*d.px, 'y':self.cay-8*d.py, 'xdim': 50, 'ydim':63})
     
     def save(self):
+        self.stopQuerying()
         
         a = self.getBtnValById(A)
         b = self.getBtnValById(B)
@@ -130,11 +125,8 @@ class CalibrationView(v.View):
                                     )
                          )
             return
-        self.stopQuerying()
-
-        self.sensorData[d.SENSOR_A] = a
-        self.sensorData[d.SENSOR_B] = b
-        self.sensorData[d.SENSOR_LAST] = dp.DateParse(self.app.getEnvData(d.TIME)).getDateTime()
+        self.sensorData[d.SENSOR_A] = self.getBtnValById(A)
+        self.sensorData[d.SENSOR_B] = self.getBtnValById(B)
         
         #make it more efficient - access only needed data fields
         allSensors = self.app.getSetting(d.SENSOR_BANK)
@@ -338,7 +330,8 @@ class CalibrationView(v.View):
     def humidityIn(self, value):
         self.setLabelById(ADC, d.DS_HUM, value)
         if self.focusNum == inTest:
-            self.add2Vec(d.DS_HUM, value)
+            self.add2Vec(d.DS_POT, value)
+
     def anglePotIn(self, value):
         self.setLabelById(ADC, d.DS_POT, value)
         if self.focusNum == inTest:
@@ -376,7 +369,7 @@ class CalibrationView(v.View):
                                     )
                          )
             return
-        self.resetVectors()
+
         self.focusNum = inTest
         self.app.updateScreen()
         notifThread = thr.Thread(target = self.notifyAfterDelay)
@@ -398,18 +391,14 @@ class CalibrationView(v.View):
         
     def add2Vec(self, sensor, value):
         if (sensor == self.sensorType):
-            try:
-                floatVal = float(value)
-                self.dataVector = np.append(self.dataVector, floatVal)
-            except:
-                pass
+            self.dataVector = np.append(self.dataVector, float(value))
             
-#     def fullStreamDataIn(self, anglePot, angleImu, forceValueX, forceValueY, timeValue):
-#         super().fullStreamDataIn(anglePot, angleImu, forceValueX, forceValueY, timeValue) 
-#         self.setLabel('X LOAD', forceValueX)
-#         self.setLabel('Y LOAD', forceValueY)
-#         self.setLabel('POT. ROTATION', anglePot)
-#         self.setLabel('IMU. ROTATION', angleImu)
+    def fullStreamDataIn(self, anglePot, angleImu, forceValueX, forceValueY, timeValue):
+        super().fullStreamDataIn(anglePot, angleImu, forceValueX, forceValueY, timeValue) 
+        self.setLabel('X LOAD', forceValueX)
+        self.setLabel('Y LOAD', forceValueY)
+        self.setLabel('POT. ROTATION', anglePot)
+        self.setLabel('IMU. ROTATION', angleImu)
 
     def computeBestFit(self):
         result = np.polyfit(self.realVals, self.adcVals, deg = 1)

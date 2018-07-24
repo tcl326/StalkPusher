@@ -70,12 +70,6 @@ class View(object):
         
     def initButAreaByDefs(self, btnDefs):
         self.butArea = ba.ButArea(self.app, btnDefs)
-        
-    def addBtn(self, index, btnDef, focus = -1):
-        if focus == -1 or self.focusNum == focus:
-            self.butArea.switchBtn(index, btnDef)        
-    def hasMsg(self):
-        return len(self.messages)    
     def pushMsg(self, msg):
         self.messages.append(msg)
         self.app.updateScreen()
@@ -101,9 +95,8 @@ class View(object):
         self.app.updateScreen()
 
     def popAllMsg(self):
-        if len(self.messages):
-            del self.messages[:]
-            self.initButArea()
+        del self.messages[:]
+        self.initButArea()
         
     def keyboardReturn(self, key, value, status = 1):
         return value
@@ -176,15 +169,13 @@ class View(object):
 #             val = 0.0
 #         return (val-b)/a
     def convertedVector(self, vector, dataType):
-        if vector == d.NUL_ARD_IN:
-            return vector        
         (a, b) = self.getAB(dataType)
         try:
             retVal = (float(vector)-b)/a
             return retVal
         except Exception as e:
             print('invalid data in', vector, str(e))
-            return vector
+    
     def getAB(self, sensorType):
         sensorName = self.app.getSetting(d.SENSORS)[sensorType]
         sensorBank = self.app.getSetting(d.SENSOR_BANK)
@@ -253,7 +244,7 @@ class View(object):
         pass
     def focusOn(self):
         print('focus on')
-#         self.popAllMsg()
+        self.popAllMsg()
         self.app.updateScreen()
     def focusOut(self):
 #         self.popAllMsg()
@@ -263,8 +254,8 @@ class View(object):
         print('focus on with arg')
     def goBack(self):
         self.app.setView(self.prevView)
-#     def goBackWithArg(self, arg):
-#         self.app.setViewWithArg(self.prevView, arg)
+    def goBackWithArg(self, arg):
+        self.app.setViewWithArg(self.prevView, arg)
     def okBtnAction(self):
         pass
     def bringRestartMsg(self):

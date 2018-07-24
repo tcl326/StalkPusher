@@ -13,20 +13,20 @@ import matplotlib.ticker as ticker
 import pylab as pl
 import time as t
 class Graph:
-    def __init__(self, disp, geoData, xlabel = '', ylabel = '', graphNum =1):
+    def __init__(self, disp, geoData, xlabel = '', ylabel = ''):
         self.disp = disp
         self.x = geoData['x']
         self.y = geoData['y']
         self.xdim = geoData['xdim']
         self.ydim = geoData['ydim']
-        self.initMPL(graphNum)
+        self.initMPL()
         self.updImgInt = 0.1 #in seconds 
         self.resetUpdateTime()
     def resetPlot(self):
         #self.initMPL()
         self.clear()
 #         pass
-    def initMPL(self, graphNum):
+    def initMPL(self):
         self.fig = plt.figure(
             figsize=(self.xdim* d.pxIn, self.ydim* d.pyIn),
             dpi = d.dpi,
@@ -45,7 +45,6 @@ class Graph:
         self.lastUpdT = t.time()
 #         pass
     def clear(self):
-#         plt.close('all')
         self.ax.clear()
         self.canvas.draw()
         renderer = self.canvas.get_renderer()
@@ -55,8 +54,8 @@ class Graph:
 
     def updatePlot(
             self,
-            x = np.array([]),
-            y1 = np.array([]),
+            x,
+            y1,
             y2 = np.array([]),
             xlabel = 'xlabel',
             ylabel ='ylabel',
@@ -65,12 +64,8 @@ class Graph:
             a = None,
             b = None
         ):
-
-#         plt.close('all')
-#         self.clear()
         
         self.ax.clear()
-        self.canvas.draw()
 
         self.ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
         self.ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
@@ -79,9 +74,9 @@ class Graph:
         self.ax.yaxis.set_major_locator(ticker.MaxNLocator(5))
         
         
-#         print('x', len(x))
-#         print('y1', len(y1))
-#         print('y2', len(y2))
+        print('x', len(x))
+        print('y1', len(y1))
+        print('y2', len(y2))
 
         self.ax.plot(x, y1,
             'o',
@@ -136,8 +131,7 @@ class Graph:
         size = self.canvas.get_width_height()
         self.plotImgSurf =  pg.image.fromstring(raw_data, size, "RGB")
 
-    def close(self):
-        plt.clf()
+
     def display(self, x, y):
         if (t.time() - self.lastUpdT >= self.updImgInt):
             try:

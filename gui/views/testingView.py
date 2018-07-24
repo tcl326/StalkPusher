@@ -23,7 +23,6 @@ from items import message as msg
 from utils import postProcess as pp
 from utils import dateParse as dp
 from items import viewBtn as vb
-from utils import timer as tim
 preTest = 0
 inTest = 1
 postTest = 2
@@ -48,11 +47,11 @@ class TestingView(v.View):
                 (
                     {'label':'BREAK\nHEIGHT', 'id':'selectBtn', 'funct':self.setBreakHeight},
                     {'label':'SELECT', 'id':'selectBtn', 'funct':self.selectBtn},
-                    {},
+                    {'label': 'SAVE', 'id': 'saveBtn', 'funct': self.save},
                     {'label': 'REJECT', 'id': 'bckBtn', 'funct': self.drop}
-                )
+                ),
             ]
-        self.saveBtnDef = {'label': 'SAVE', 'id': 'saveBtn', 'funct': self.save}
+
         super().__init__(app, prevView)
         
 
@@ -84,47 +83,16 @@ class TestingView(v.View):
                                      bcgCol = d.light_green,
                                      scaleFactor = 0.7
                                      )#in progress rectangle
-        
-        
-        self.postItems = []
-        self.setPostItemFocusNum(0)
-
-        self.envDataFlags = [0]*4
-
-        self.initConfMsgsShown = False
-        
-        self.postItems.append(nl.NoteList(self.app, self.disp,{'x':self.cax-28*d.px,'y':self.cay, 'xdim':20*d.px, 'ydim': 25*d.py}, listName = 'postTestNotes', hasFocus = True))
-
-        self.postItems.append(vb.ViewBtn(app = self.app,
-                                    pos = (self.cax-4*d.px, self.cay + 42 * d.py),
-                                    dim = (22 * d.px, 12*d.py),
-                                    label = 'Load',
-                                    value = 'F',
-                                    funct = self.switchLoadMode,
-                                    focus = False,
-                                    formating = lambda lab, val: lab+ ': ' + str(val)
-                                    )
-                          )
-
-        self.postItems.append(vb.ViewBtn(app = self.app,
-                                    pos = (self.cax+22*d.px, self.cay + 42 * d.py),
-                                    dim = (22 * d.px, 12*d.py),
-                                    label = 'Rot.',
-                                    value = 'IMU',
-                                    funct = self.switchRotMode,
-                                    focus = False,
-                                    formating = lambda lab, val: lab+ ': ' + str(val)
-                                    )
-                          )
-
-#         self.makeConfirmMsgs()
+        self.makeConfirmMsgs()
         
 
     def initPreTestInfoLayout(self):
         self.setItemFocusNum(0)
+        self.setPostItemFocusNum(0)
         self.cols = [self.cax - 20*d.px, self.cax + 20*d.px]
         
         self.items = []
+        self.postItems = []
         
         yRef = 26 * d.py
         yInt = 20 * d.py
@@ -178,9 +146,33 @@ class TestingView(v.View):
                                     formating = lambda lab, val: lab+ ':\n' + str(val)
                                     )
                           )
-        self.items.append(None)        
+        self.items.append(None)
+
+        self.postItems.append(nl.NoteList(self.app, self.disp,{'x':self.cax-29*d.px,'y':self.cay, 'xdim':20*d.px, 'ydim': 25*d.py}, listName = 'postTestNotes', hasFocus = True))
+
+        self.postItems.append(vb.ViewBtn(app = self.app,
+                                    pos = (self.cax-4*d.px, self.cay + 42 * d.py),
+                                    dim = (22 * d.px, 12*d.py),
+                                    label = 'Load',
+                                    value = 'F',
+                                    funct = self.switchLoadMode,
+                                    focus = False,
+                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    )
+                          )
+
+        self.postItems.append(vb.ViewBtn(app = self.app,
+                                    pos = (self.cax+22*d.px, self.cay + 42 * d.py),
+                                    dim = (22 * d.px, 12*d.py),
+                                    label = 'Rot.',
+                                    value = 'IMU',
+                                    funct = self.switchRotMode,
+                                    focus = False,
+                                    formating = lambda lab, val: lab+ ': ' + str(val)
+                                    )
+                          )
+        
     def makeConfirmMsgs(self):
-        self.popAllMsg()
         #test folder
         self.pushMsg(msg.Message(self.app, self, self.disp,
                                     'Confirm/edit test folder.',
@@ -190,8 +182,7 @@ class TestingView(v.View):
                                         {'label': 'EDIT', 'id': 'yesBtn', 'funct': (self.popMsg, self.toTestFolderSetting)},
                                         {},
                                         {}
-                                    ),
-                                    bdData = {'font': self.app.confMsgBdFont}
+                                    )
                                     )
                          )
         #plot number
@@ -203,8 +194,7 @@ class TestingView(v.View):
                                         {'label': 'EDIT', 'id': 'yesBtn', 'funct': (self.popMsg, self.toPlotSetting)},
                                         {},
                                         {}
-                                    ),
-                                    bdData = {'font': self.app.confMsgBdFont}
+                                    )
                                     )
                          )
         
@@ -217,8 +207,7 @@ class TestingView(v.View):
                                         {'label': 'EDIT', 'id': 'yesBtn', 'funct': (self.popMsg, self.toHeightSetting)},
                                         {},
                                         {}
-                                    ),
-                                    bdData = {'font': self.app.confMsgBdFont}                                 
+                                    )
                                     )
                          )
         
@@ -232,8 +221,7 @@ class TestingView(v.View):
                                         {'label': 'EDIT', 'id': 'yesBtn', 'funct': (self.popMsg, self.toNoteSetting)},
                                         {},
                                         {}
-                                    ),
-                                    bdData = {'font': self.app.confMsgBdFont}                                 
+                                    )
                                     )
                          )
         self.pushMsg(msg.Message(self.app, self, self.disp,
@@ -244,8 +232,7 @@ class TestingView(v.View):
                                         {'label': 'EDIT', 'id': 'yesBtn', 'funct': (self.popMsg, self.setOperator)},
                                         {},
                                         {}
-                                    ),
-                                    bdData = {'font': self.app.confMsgBdFont}                                                      
+                                    )
                                     )
                          )
         
@@ -312,7 +299,7 @@ class TestingView(v.View):
         dataMatrix.append(['BREAK_HEIGHT', self.breakHeight if self.breakHeight is not None else 'N/A', d.HEIGHT_UNIT]) 
 
         ####SENSORS
-        dataMatrix.append(['----------SENSOR CALIBRATION DATA (stored_value*A + B = raw_data)------'])
+        dataMatrix.append(['----------SENSOR CALIBRATION DATA-----------'])
 
         dataMatrix.append(['SENSOR','A','B','UNIT', 'ID'])
         
@@ -325,44 +312,45 @@ class TestingView(v.View):
         dataMatrix.append([d.DS_TEMP] + list(self.getABUnit(d.DS_TEMP)) + [sensorData[d.DS_TEMP]])
         dataMatrix.append([d.DS_HUM] + list(self.getABUnit(d.DS_HUM)) + [sensorData[d.DS_HUM]])                               
                                
-        ###TEST DATA
-        max_len = len(self.times)
+        ###
         
         dataMatrix.append(['----------TEST DATA-----------'])
         
-        dataMatrix.append(d.testHeaders)       
-        for i in range(max_len):
-            dataMatrix.append([self.times[i], self.anglePots[i], self.angleImus[i], self.loadsX[i], self.loadsY[i]])
-                    
-        TEST_FOLDERS_PATH = os.path.join(d.RASPI_DATA_PATH, d.TESTS_DIR)
-        if not os.path.isdir(TEST_FOLDERS_PATH):
-            os.makedirs(TEST_FOLDERS_PATH)
-                        
-        folderPath = os.path.join(TEST_FOLDERS_PATH, self.app.getSetting(d.TEST_FOLDER))
+        max_len = len(self.times)
+        
+        
+        if os.path.exists(d.USB_DATA_PATH):
+            #usb is plugged in
+            if not os.path.exists(d.USB_DATA_PATH + d.TESTS_DIR):
+                #the tests folder does not exist ont he usb
+                os.makedirs(d.USB_DATA_PATH + d.TESTS_DIR)
+            TEST_FOLDERS_PATH = d.USB_DATA_PATH + d.TESTS_DIR
+        else:
+            if not os.path.exists(d.RASPI_DATA_PATH + d.TESTS_DIR):
+                os.makedirs(d.RASPI_DATA_PATH + d.TESTS_DIR)
+            TEST_FOLDERS_PATH = d.RASPI_DATA_PATH + d.TESTS_DIR
+                
+        fileName = self.app.getEnvData(d.TIME)
+        folderPath = TEST_FOLDERS_PATH + '/' + self.app.getSetting(d.TEST_FOLDER)
+        writePath =  folderPath + '/' + fileName
         if not os.path.isdir(folderPath):
             os.makedirs(folderPath)
-
-        fileName = self.app.getEnvData(d.TIME)
-        writePath = os.path.join(folderPath, fileName)
-        
-        if os.path.exists(writePath + d.TEST_FILE_FORMAT):
+        if os.path.exists(writePath + '.csv'):
             i = 2
-            while os.path.exists(writePath +'(' + str(i) + ')' + d.TEST_FILE_FORMAT):
+            while os.path.exists(writePath +'(' + str(i) + ').csv'):
                 i+=1
-            writePath = writePath +'(' + str(i) + ')'
-            
-        with open(writePath  + d.TEST_FILE_FORMAT, 'w', newline='') as csvfile:
+            writePath = writePath + '(' + str(i) + ')'
+        with open(writePath + '.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile, delimiter=',',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            #writing that data to file
             for row in dataMatrix:
                 writer.writerow(row)
-#             writer.writerow(d.testHeaders)
-#             for i in range(max_len):
-#             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#                 writer.writerow([self.times[i], self.anglePots[i], self.angleImus[i], self.loadsX[i], self.loadsY[i]])
-#             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        print('written file to: ' + writePath + '.csv')
+            writer.writerow(['ANGLE_POT', 'ANGLE_IMU', 'LOAD_X', 'LOAD_Y', 'TIME'])
+            for i in range(max_len):
+            #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                writer.writerow([self.anglePots[i], self.angleImus[i], self.loadsX[i], self.loadsY[i], self.times[i]])
+            #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            print('written file to: ' + writePath + '.csv')
     def padArray(self, arr, max_len):
         for i in range(max_len):
             if i >len(arr)-1:
@@ -400,7 +388,7 @@ class TestingView(v.View):
     def toTestFiles(self):
         from views import pastTestsView as ptv
         print('go to past tests')
-        self.app.setView(ptv.PastTestsView(self.app, self.graph, self))
+        self.app.setView(ptv.PastTestsView(self.app, self))
         
     #     self.focusItem.
     def toNoteSetting(self):
@@ -418,7 +406,7 @@ class TestingView(v.View):
         
     def toTestFolderSetting(self):
         self.app.setView(kbv.KeyboardView(self.app, self,
-                                      d.ALPHA,
+                                      d.WORD,
                                       'Test folder',
                                       'testFolder',
                                       self.app.getSetting(d.TEST_FOLDER)
@@ -429,20 +417,7 @@ class TestingView(v.View):
             self.app.saveSetting(d.TEST_FOLDER, value)
             self.initPreTestInfoLayout()
         elif key == 'breakHeight':
-            try:
-                self.breakHeight = float(value)
-            except:
-                self.pushMsg(msg.Message(self.app, self, self.disp,
-                                            'Invalid height format.',
-                                            'Please enter a valid height.',
-                                            btnDefs = (
-                                                {'label': 'OK', 'id': 'yesBtn', 'funct': self.popMsg},
-                                                {'label': 'RETRY', 'id': 'yesBtn', 'funct': (self.popMsg, self.setBreakHeight)},
-                                                {},
-                                                {}
-                                            )
-                                        )
-                                 )
+            self.breakHeight = float(value)
         elif key == 'operator':
             self.app.saveSetting(d.OPERATOR, value)
             self.initPreTestInfoLayout()
@@ -458,13 +433,9 @@ class TestingView(v.View):
         self.app.setView(hv.HeightView(self.app, self))
 
     def bringIfConfirmMsg(self):
-        if not self.tests:
-            if not self.initConfMsgsShown:
-                self.initConfMsgsShown = True
-                self.makeConfirmMsgs()        
-        elif not self.tests % self.app.getSetting(d.DATA_CONFIRM_FREQ):
+        if not self.tests % self.app.getSetting(d.DATA_CONFIRM_FREQ):
             self.makeConfirmMsgs()
-
+    
     def resetVectors(self):
         self.testData = np.array([])
         self.times = np.array([])
@@ -478,21 +449,16 @@ class TestingView(v.View):
 #         self.startDataIn = t.time()
         #self.focusNum = 1
         #self.raspTimes = []
-#         self.app.hd.getAll()
+        self.app.hd.getAll()
         self.app.streaming = True
         self.focusNum = inTest
         self.initButArea()
         self.app.hd.startStream()
     #overridden
     def convertedVector(self, vector, dataType):
-        if isinstance(vector, str):
-            return vector
         (a, b) = self.getAB(dataType)
         return (vector-b)/a
         
-    def addSaveBtn(self):
-        self.addBtn(2, self.saveBtnDef, postTest)
-            
     def stopTest(self):
         #self.focusNum = 2
 #         self.stopDataIn = t.time()
@@ -505,31 +471,17 @@ class TestingView(v.View):
 #         self.app.hd.getAll()
         self.initButArea()
         
-        tim.setTimer(d.SAVE_BTN_DELAY, self.addSaveBtn)
         #truncate data
         min_len = min(len(self.anglePots), len(self.angleImus), len(self.loadsX), len(self.loadsY), len(self.times))
         trunc = lambda a,i: a[0:i] if len(a) > i else a
 
-#         print('###RAW VECTORS###')
-# 
-#         print('loadsX', len(self.loadsX))
-#         print('loadsY', len(self.loadsY))
-#         print('anglePots', len(self.anglePots))
-#         print('angleImus', len(self.angleImus))
-#         print('times', len(self.times))
-        
+
         self.loadsX = trunc(self.loadsX, min_len)
         self.loadsY = trunc(self.loadsY, min_len)
         self.anglePots = trunc(self.anglePots, min_len)
         self.angleImus = trunc(self.angleImus, min_len)
         self.times = trunc(self.times, min_len)
                 
-#         print('###POST VECTOR TRUNCATION###')
-#         print('loadsX', len(self.loadsX))
-#         print('loadsY', len(self.loadsY))
-#         print('anglePots', len(self.anglePots))
-#         print('angleImus', len(self.angleImus))
-#         print('times', len(self.times))
         
         if self.times.size > 0:
             self.times -= self.times[0]
@@ -540,86 +492,16 @@ class TestingView(v.View):
         self.loadsY = self.convertedVector(self.loadsY, d.DS_LOAD_Y)
         self.anglePots = self.convertedVector(self.anglePots, d.DS_POT)
         self.angleImus = self.convertedVector(self.angleImus, d.DS_IMU)
-        
-#         print('###POST VECTOR CONVERSION###')
-#         print('loadsX', len(self.loadsX))
-#         print('loadsY', len(self.loadsY))
-#         print('anglePots', len(self.anglePots))
-#         print('angleImus', len(self.angleImus))
-#         print('times', len(self.times))
 
         ####
         self.loads = np.sqrt(self.loadsX**2 + self.loadsY**2)
         
-#         print('###POST VECTOR ADDITION###')
-#         print('loadsX', len(self.loadsX))
-#         print('loadsY', len(self.loadsY))
-#         print('anglePots', len(self.anglePots))
-#         print('angleImus', len(self.angleImus))
-#         print('times', len(self.times))
         
 #         self.madeUpData()
                       
                       
                       
         self.redrawGraph()
-        
-    def save(self):
-        self.app.hd.getAll()
-        if not len(self.times):
-            self.pushMsg(msg.Message(self.app, self, self.disp,
-                                        'Unable to save.',
-                                        'No data or corrupted data. Check Serial Connection and retry.',
-                                        btnDefs = (
-                                            {'label': 'OK', 'id': 'yesBtn', 'funct': self.popMsg},
-                                            {},
-                                            {},
-                                            {}
-                                        )
-                                    )
-                             )
-            return
-        startWait = t.time()
-        i = 0
-        while not self.envDataReady():
-            if t.time() - startWait >= d.SAVE_TIMEOUT:
-                self.resetEnvData()
-                self.pushMsg(msg.Message(self.app, self, self.disp,
-                                            'Unable to save.',
-                                            'No environmental data available (time, location, humidity, temperature). Retry, save anyways, or abort.',
-                                            btnDefs = (
-                                                {'label': 'SAVE\nANYWAY', 'id': 'yesBtn', 'funct': (self.resetEnvData, self.popMsg, self.saveTest, self.drop)},
-                                                {'label': 'RETRY', 'id': 'yesBtn', 'funct': (self.popMsg, self.save)},
-                                                {'label': 'ABORT', 'id': 'yesBtn', 'funct': (self.resetEnvData, self.popMsg)},
-                                                {}
-                                            )
-                                        )
-                                 )
-                return
-            i += 1
-
-
-
-        
-        self.resetEnvData()                 
-        self.saveTest()
-        self.drop()
-
-    def drop(self):
-#         self.app.hd.getAll()
-        self.postItems[0].deSelectAll()
-        self.resetVectors()
-        self.focusNum = preTest
-        self.initButArea()
-        self.bringIfConfirmMsg()
-
-    def back(self):
-        if self.app.streaming:
-            self.app.streaming = False
-            self.app.hd.stopStream()
-        from views import mainView as mv
-        self.app.setView(self.prevView)
-
     def madeUpData(self):
         self.anglePots = np.arange(6, 26, 1)
         self.angleImus = self.anglePots
@@ -631,11 +513,11 @@ class TestingView(v.View):
         self.loads = self.loadsX##np.sqrt(self.loadsX**2 + self.loadsY**2)
 
     def redrawGraph(self, highlights = np.array([]), annotations = []):
-#         print('redrawing')
+        print('redrawing')
         if not len(self.times):
-#             print('clearing')
+            print('clearing')
             self.graph.clear()
-#             print('returnng')
+            print('returnng')
             return
                         
         with self.app.hd.threadLock:
@@ -718,11 +600,40 @@ class TestingView(v.View):
         self.postItems[2].setValue('Pot.'if self.drawPots else 'IMU')        
         self.redrawGraph()
     
+    def save(self):
+        if not len(self.times):
+            self.pushMsg(msg.Message(self.app, self, self.disp,
+                                        'Unable to save.',
+                                        'No data or corrupted data. Check Serial Connection and retry.',
+                                        btnDefs = (
+                                            {'label': 'OK', 'id': 'yesBtn', 'funct': self.popMsg},
+                                            {},
+                                            {},
+                                            {}
+                                        )
+                                        )
+                             )
+            return
+        self.saveTest()
+        self.drop()
+    def drop(self):
+        self.resetVectors()
+        self.focusNum = preTest
+        self.initButArea()
+        self.bringIfConfirmMsg()
+
+    def back(self):
+        if self.app.streaming:
+            self.app.streaming = False
+            self.app.hd.stopStream()
+        from views import mainView as mv
+        self.app.setView(self.prevView)
+
     def simulateDataIn(self):
         self.fullStreamDataIn(ri(0,100), ri(0,200), ri(0,100), ri(0,100), ri(0,100))
         self.lastDataT = t.time()
     def startGraph(self):
-        self.graph = g.Graph(self.disp, {'x':self.cax+10*d.px, 'y':self.cay-2*d.py, 'xdim': 54, 'ydim':73})
+        self.graph = g.Graph(self.disp, {'x':self.cax+10*d.px, 'y':self.cay-2*d.py, 'xdim': 55, 'ydim':73})
     def displayView(self):
         self.butArea.display()
         if self.focusNum == preTest:
@@ -822,39 +733,13 @@ class TestingView(v.View):
             self.times = np.append(self.times, float(value))
 #         else:
 #             self.app.hd.stopStream()
-#         print('raspi: ' + str(int((t.time() - self.tr)*1000)), 'arduino: ' + str(float(value) - self.ta))
+        print('raspi: ' + str(int((t.time() - self.tr)*1000)), 'arduino: ' + str(float(value) - self.ta))
         self.tr = t.time()
         self.ta = float(value)
-        
-        self.envDataFlags
-    
-    def timeIn(self, year, month, day, hour, minute, second, millis):
-        super().timeIn(year, month, day, hour, minute, second, millis)
-        self.envDataFlags[0] = 1      
-    def locationIn(self, x, y):
-        super().locationIn(x, y)
-        self.envDataFlags[1] = 1      
-    def noGPS(self):
-        super().noGPS()
-        self.envDataFlags[1] = 1      
-    def temperatureIn(self, value):
-        super().temperatureIn(value)
-        self.envDataFlags[2] = 1      
-    def humidityIn(self, value):
-        super().humidityIn(value)
-        self.envDataFlags[3] = 1      
-    def envDataReady(self):
-        for flag in self.envDataFlags:
-            if not flag:
-                return False
-        return True
-    def resetEnvData(self):
-        self.envDataFlags = [0] *4
+    def fullStreamDataIn(self, anglePot, angleImu, forceValueX, forceValueY, timeValue):
+        pass
     def focusOn(self):
         self.initPreTestInfoLayout()
-        self.postItems[0].checkIntegrity()
-#         self.postItems[0].reset()
-        self.bringIfConfirmMsg()
         super().focusOn()
         
     class NoteListWrapper:

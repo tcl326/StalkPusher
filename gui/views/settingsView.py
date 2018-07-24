@@ -8,9 +8,6 @@ from utils import text as txt
 from items import message as msg
 from items import viewBtn as vb
 from views import keyboardView as kbv
-from utils import misc as m
-import threading as thr
-import time as t
 import os
 class SettingsView(v.View):
     def __init__(self, app, prevView = None):
@@ -31,15 +28,14 @@ class SettingsView(v.View):
             {'label': 'SENSORS', 'funct': self.toSensorSettingView},
 #             {'label': 'VOLUME', 'funct': self.toPendingSetting},
 #             {'label': 'GPS', 'funct': self.toPendingSetting},
-            {'label': 'OPERATOR', 'funct': self.setOperator},
-            {'label': 'UPDATE', 'funct': self.checkUSB}
+            {'label': 'UPDATE', 'funct': self.checkUSB},
+            {'label': 'OPERATOR', 'funct': self.setOperator}
 #             {'label': 'ABOUT', 'funct': self.toPendingSetting},
         )
-        self.updateComplete = False
         self.numStnBtnRow = 2
         self.numStnBtnCom = 3
         self.setStnFocusNum(0)
-        self.stnBtnsCols = (self.cax - 26*d.px, self.cax, self.cax + 26*d.px)
+        self.stnBtnsCols = (self.cax - 24*d.px, self.cax, self.cax + 24*d.px)
         self.stnBtnsRows = (self.cay - 24*d.py, self.cay, self.cay + 24*d.py)
         self.addStnBtns()
     def setStnFocusNum(self, num):
@@ -52,7 +48,7 @@ class SettingsView(v.View):
             col = self.stnBtnsCols[i % 3]
             self.stnBtns.append(vb.ViewBtn(app = self.app,
                                            pos = (col, row),
-                                           dim = (22*d.px, 18*d.py),
+                                           dim = (20*d.px, 18*d.py),
                                            label = self.stnBtnDefs[i]['label'],
                                            funct = self.stnBtnDefs[i]['funct'],
                                            focus =  i == self.stnBtnFocusNum),
@@ -131,41 +127,45 @@ class SettingsView(v.View):
             self.stnBtnFocusNum+=1
             self.stnBtns[self.stnBtnFocusNum].setFocus(True)
             
-            
-    '''
-    Update protocol:
-    - User plugs in USB stick
-    - User presses UPDATE button
-    - GUI looks for valid update files
-        -a root folder named 'update'
-            -a StalkPusher folder
-            -an updateData.json file
-            -an updateScript.py script [OPTIONAL]
-    - If not found: message saying not found
-    - If found: message saying found and comparing versions
-    - If user wants to update:
-        -execute Script
-        -copy and paste, StalkPusher folder to desktop, overriding all but:
-            -appData.json [in accordance with updateData.json]
-        -update appData.json with new version number
-        -set all permissions on written files and folders
-        
-        -If succesful display success message and put Restart message
-            -When restart, do the restart
-        -If not:
-            -put fail message with revert changes btn
-            -if revert changes, revert changes
-            
-    Special attention should be given to:
-        -appData.json
-            -make sure there is a default value returned when given data field does not exist yet
-                -if default value returned, save it immediatly under given data field
-            -make sure software can handle those default values everywhere
-            -make sure able to write when given data field does not exist yet
-        -test files
-            -make sure test file read routine is flexible enough to recognize variable start and end positions of vectors
-    '''
-    
+#     class SettingBtn:
+#         def __init__(self, app,geoData, metaData, focus):
+#             self.app = app
+#             self.disp = self.app.disp
+#             self.x = geoData['x']
+#             self.y = geoData['y']
+#             self.xdim = 18*d.px
+#             self.ydim = 18*d.py
+#             self.label = metaData['label']
+#             self.funct = metaData['funct']
+#             self.setFocus(focus)
+#             self.txtDim = int(3.8*d.px)
+#             self.setBcgCol()
+# 
+#             self.setFontCol()
+# 
+#             self.setFont()
+# 
+#             self.setTxt()
+# 
+#         def setFocus(self, focus):
+#             self.focus = focus
+#             self.setBcgCol()
+#             self.app.updateScreen()
+#         def setTxt(self):
+#             self.txt = self.font.render(self.label, True, self.fontCol)
+#         def setFont(self):
+#             self.font = pg.font.SysFont('Arial', self.txtDim, bold = True)
+#         def setBcgCol(self):
+#             self.bcgCol = d.textView_highlight_col if self.focus else self.app.textView_col
+#         def setFontCol(self):
+#             self.fontCol = self.app.font_col
+# 
+#         def display(self):
+#             # display rect
+#             pg.draw.rect(self.disp, self.bcgCol, (self.x - self.xdim / 2, self.y - self.ydim / 2, self.xdim, self.ydim))
+#             #display number
+#             self.disp.blit(self.txt, (self.txt.get_rect(center=(self.x, self.y))))
+
     """
     Update SUB Stick structure
     /
@@ -182,40 +182,33 @@ class SettingsView(v.View):
     - etc.
     """
     def checkUSB(self):
-        if self.app.test is not None:
-            if self.app.test.testing:
-                return
         validUpdate = False
-        scriptUpdate = False
-        updatePath = os.path.join(d.USB_DATA_PATH, d.UPDATE_DIR)
+        updatePath = d.USB_DATA_PATH+d.UPDATE_DIR
+        print('u[date path: ', updatePath)
         print('checking if update path exists')
 
         if os.path.exists(updatePath):
-            updateDataPath = os.path.join(updatePath, d.UPDATE_DATA_FILE)
+            updateDataPath = os.path.join(updatePath, 'updateData.json')
+            print('u[date data path: ', updateDataPath)
             print('update path exists')
             if os.path.isfile(updateDataPath):
                 updateData = d.readSettingFromFile(updateDataPath)
                 newVersion = updateData['version']
                 validUpdate = True
                 print('update data exists')
-                updateScriptFile = os.path.join(updatePath, d.UPDATE_SCRIPT_FILE)
-                if os.path.isfile(updateScriptFile):
-                    print('update script exists')
-                    scriptUpdate = True
-                    
+
         if validUpdate:
-                self.pushMsg(msg.Message(self.app, self, self.disp,
-                                            'Valid update found.',
-                                            ('Update contains custom script. ' if scriptUpdate else '') + 'Current version: ' + self.app.getSetting(d.VERSION) + ' New version: ' + newVersion,
-                                            btnDefs = (
-                                                {'label': 'UPDATE', 'id': 'yesBtn', 'funct': (self.popMsg, self.startUpdate)},
-                                                {},
-                                                {},
-                                                {'label': 'CANCEL', 'id': 'yesBtn', 'funct': self.popMsg}
-                                            )
-                                            )
-                                 )
-                
+            self.pushMsg(msg.Message(self.app, self, self.disp,
+                                        'Valid update found.',
+                                        'Current version: ' + self.app.getSetting(d.VERSION) + ' New version: ' + newVersion,
+                                        btnDefs = (
+                                            {'label': 'UPDATE', 'id': 'yesBtn', 'funct': (self.popMsg, self.updateSoftware)},
+                                            {},
+                                            {},
+                                            {'label': 'CANCEL', 'id': 'yesBtn', 'funct': self.popMsg}
+                                        )
+                                        )
+                             )
         else:
             #either no USB stick or incorrect folder structure
             self.pushMsg(msg.Message(self.app, self, self.disp,
@@ -229,85 +222,29 @@ class SettingsView(v.View):
                                         )
                                         )
                              )
-
-#     def customUpdate(self):
-#         updateScriptPath = os.path.join(os.path.join(d.USB_DATA_PATH, d.UPDATE_DIR), UPDATE_SCRIPT_FILE)
-#         m.osCommand('sudo python3 ' + updateScriptPath)        
-#         
-#         self.pushMsg(msg.Message(self.app, self, self.disp,
-#                                     'Update succesful.',
-#                                     'Restart device to apply changes.',
-#                                     btnDefs = (
-#                                         {'label': 'RESTART', 'id': 'yesBtn', 'funct': (self.popMsg, self.app.restartPi)},
-#                                         {},
-#                                         {},
-#                                         {'label': 'LATER', 'id': 'yesBtn', 'funct': self.popMsg}
-#                                     )
-#                                     )
-#                          )
-    def startUpdate(self):
-        self.pushMsg(msg.Message(self.app, self, self.disp,
-                                    'UPDATING...',
-                                    'Please wait while software is updating.',
-                                    btnDefs = (
-                                        {},
-                                        {},
-                                        {},
-                                        {}
-                                    )
-                                    )
-                         )
-        updateThread = thr.Thread(target = self.defaultUpdate)
-        updateThread.setName('UPDATE THREAD')
-        updateThread.daemon = True
-        updateThread.start()
-
-    def defaultUpdate(self):
+            
+    def updateSoftware(self):
+        import subprocess
+        updatePath = d.USB_DATA_PATH+d.UPDATE_DIR
+        newSoftwarePath = os.path.join(updatePath, 'cropDevice')
+        sampleFilePath = os.path.join(newSoftwarePath, 'sampleFile.txt')
         
-        updatePath = os.path.join(d.USB_DATA_PATH, d.UPDATE_DIR)
-        updateDataPath = os.path.join(updatePath, d.UPDATE_DATA_FILE)
-        updateData = d.readSettingFromFile(updateDataPath)
-        newVersion = updateData['version']
-        overrideAppData = updateData['overrideAppData']
+        command = 'sudo cp ' + sampleFilePath + ' ' + d.MAINAPP_PATH
+        process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        output = process.communicate()[0]
         
-        updSoftwarePath = os.path.join(updatePath, d.STALK_PUSHER_DIR)
-        
-        #copy
-        if overrideAppData:
-            m.osCommand('rm -r ' + d.APP_PATH)
-            m.osCommand('cp -r ' + updSoftwarePath + ' ' + d.DESKTOP_PATH)
-        else:
-            oldAppData = d.readSettings()
-            oldAppData[d.VERSION] = newVersion
-            m.osCommand('rm -r ' + d.APP_PATH)
-            m.osCommand('cp -r ' + updSoftwarePath + ' ' + d.DESKTOP_PATH)
-            d.saveSettingsObject(oldAppData)
-        #set permissions to all
-        for path, subdirs, files in os.walk(d.APP_PATH):
-            m.osCommand('chmod 777 ' + path)
-            for name in files:
-                filePath = os.path.join(path, name)
-                m.osCommand('chmod 777 ' + filePath)
-        
-        updateScriptFile = os.path.join(updatePath, d.UPDATE_SCRIPT_FILE)
-        if os.path.isfile(updateScriptFile):
-            m.osCommand('python3 ' + updateScriptFile)
-        
-        try:
-            restartRequired = updateData['restartRequired']
-        except:
-            restartRequired = True
-
-        self.popMsg()        
         self.pushMsg(msg.Message(self.app, self, self.disp,
                                     'Update succesful.',
-                                    'Restart is required.' if restartRequired else 'Restart is recommended. Changes will not apply until restart.',
+                                    'Restart device to apply changes.',
                                     btnDefs = (
                                         {'label': 'RESTART', 'id': 'yesBtn', 'funct': (self.popMsg, self.app.restartPi)},
                                         {},
                                         {},
-                                        {} if restartRequired else {'label': 'LATER', 'id': 'yesBtn', 'funct': self.popMsg}
+                                        {'label': 'LATER', 'id': 'yesBtn', 'funct': self.popMsg}
                                     )
                                     )
                          )
+        
+        
+        
 

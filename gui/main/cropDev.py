@@ -10,14 +10,11 @@ from main import defs as d
 from views import testingView as tv
 from views import settingsView as sv
 from views import liveFeedView as lfv
-from main import test
 import time as t
 import threading as thr
 import sys
 import os
 
-cropDevErrorLogFile = open(d.ERROR_LOG_FILE, 'a+')
-sys.stderr = cropDevErrorLogFile
 
 class CropDevMain:
     def __init__(self):
@@ -34,9 +31,6 @@ class CropDevMain:
         self.initHDInput()
         self.initBtnInput()
         self.initPG()
-        self.test = None
-#         self.test = test.Test(self)
-
         self.loop()
     def pushMsg2Stack(self, msg):
         self.msgStack.append(msg)
@@ -75,8 +69,6 @@ class CropDevMain:
         self.kbKeyFont = pg.font.SysFont('Arial', d.KB_KEY_FS, True)
         self.numKeyFont = pg.font.SysFont('Arial', d.NK_FS, True)
         
-        self.confMsgBdFont = pg.font.SysFont('Arial', d.CONF_MSG_BD_FS, True)
-        
     def updateScreen(self):
 #         if not self.blitScreen:
 #         print('update screen')
@@ -106,24 +98,21 @@ class CropDevMain:
                                      }
         )
     def readSettings(self):
-#         fileData = d.readSettings()#reads entire json
-#         self.data = {}
-#         for DATA_STRING in d.dataStrings:
-#             self.data[DATA_STRING] = fileData[DATA_STRING]
-        self.data = d.readSettings()#reads entire json
-#         self.data = {}
-        colorSetting = self.getSetting(d.COLORS)
-        self.bcg_col = tuple(colorSetting['bcg_col'])
-        self.textView_col = tuple(colorSetting['textView_col'])
-        self.font_col = tuple(colorSetting['font_col'])        
+        fileData = d.readSettings()
+        self.data = {}
+        for DATA_STRING in d.dataStrings:
+            try:
+                self.data[DATA_STRING] = fileData[DATA_STRING]
+            except:
+                self.data[DATA_STRING] = 'N/A'
+                
+        self.bcg_col = tuple(self.data[d.COLORS]['bcg_col'])
+        self.textView_col = tuple(self.data[d.COLORS]['textView_col'])
+        self.font_col = tuple(self.data[d.COLORS]['font_col'])        
         
     def getSetting(self, setting):
-        try:
-            return self.data[setting]
-        except:
-            default = d.DEF_STN_MAP[setting]
-            self.saveSetting(setting, default)
-            return default
+        return self.data[setting]
+
     def saveSetting(self, setting, value):
         self.data[setting] = value
         d.saveSetting(setting, value)
@@ -137,72 +126,63 @@ class CropDevMain:
 
     def loop(self):
         while self.running:
-            try:
-                self.btnInput.checkInput()
-                self.checkBtns()
-                for event in pg.event.get():
-                    if event.type == pg.KEYDOWN:
-                        if event.key == pg.K_1:
-                            self.btn1Press()
-                        if event.key == pg.K_q:
-                            self.btn2Press()
-                        if event.key == pg.K_a:
-                            self.btn3Press()
-                        if event.key == pg.K_z:
-                            self.btn4Press()
-                        if event.key == pg.K_UP:
-                            self.upArrowPress()
-                        if event.key == pg.K_LEFT:
-                            self.leftArrowPress()
-                        if event.key == pg.K_RIGHT:
-                            self.rightArrowPress()
-                        if event.key == pg.K_DOWN:
-                            self.downArrowPress()
-                        if event.key == pg.K_p:
-                            self.takeScreenshot()
-                        if event.key == pg.K_t:
-                            self.toggleTest()
-                    if event.type == pg.QUIT:
-                        self.exit()
-                if self.blitScreen:
-    #                 print('display.update() start')
-     
-                    self.disp.fill(self.bcg_col)
-                    self.view.display()
-                    pg.display.update()
-                    self.blitScreen = False
-    #                 print('display.update() end')
-     
-                self.clock.tick(60)
+#             try:
+#             self.view.display()
+            
+            self.btnInput.checkInput()
+            self.checkBtns()
+            for event in pg.event.get():
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_1:
+                        self.btn1Press()
+                    if event.key == pg.K_q:
+                        self.btn2Press()
+                    if event.key == pg.K_a:
+                        self.btn3Press()
+                    if event.key == pg.K_z:
+                        self.btn4Press()
+                    if event.key == pg.K_UP:
+                        self.upArrowPress()
+                    if event.key == pg.K_LEFT:
+                        self.leftArrowPress()
+                    if event.key == pg.K_RIGHT:
+                        self.rightArrowPress()
+                    if event.key == pg.K_DOWN:
+                        self.downArrowPress()
+                    if event.key == pg.K_p:
+                        self.takeScreenshot()
+                if event.type == pg.QUIT:
+                    self.exit()
+            if self.blitScreen:
+#                 print('display.update() start')
+
+                self.disp.fill(self.bcg_col)
+                self.view.display()
+                pg.display.update()
+                self.blitScreen = False
+#                 print('display.update() end')
+
+            self.clock.tick(60)
             ##########################   TO BE UNCOMMENTED
-            except Exception as e:
-                if self.view is not None:
-                    from items import message as ms
-                    self.view.pushMsg(ms.Message(self, self.view, self.disp,
-                                            'Software encountered an issue.',
-                                            'Error: ' + str(e)+'. Error written to log file.',
-                                            btnDefs = (
-                                                {'label': 'OK', 'id': 'yesBtn', 'funct': self.view.popMsg},
-                                                {},
-                                                {},
-                                                {}
-                                            )
-                                            )
-                                 )
-                           
-                           
+#             except Exception as e:
+#                 if self.view is not None:
+#                     from items import message as ms
+#                     self.view.pushMsg(ms.Message(self, self.view, self.disp,
+#                                             'Software encountered an issue.',
+#                                             'Error: ' + str(e),
+#                                             btnDefs = (
+#                                                 {'label': 'OK', 'id': 'yesBtn', 'funct': self.view.popMsg},
+#                                                 {},
+#                                                 {},
+#                                                 {}
+#                                             )
+#                                             )
+#                                  )
+#                        
 #                 else:
 #                     print('Software encountered an issue. Error: ' + str(e))
-                cropDevErrorLogFile.write('\n###\n' + str(e) + '\n###')
+#                     cropDevErrorLogFile.write(str(e))
             ##########################
-    def toggleTest(self):
-        print('toggling test')
-        if self.test is not None:
-            if self.test.testing:
-                self.test.stopTest()
-            else:
-                self.test.startTest()
-            
     def checkBtns(self):
         btnPr = self.btnInput.btnPresses
         for i in range(len(btnPr)):
@@ -214,12 +194,9 @@ class CropDevMain:
             
     def setView(self, view):
         if self.view is not None:
-            print(self.view.title, 'focusout')
             self.view.focusOut()
         self.view = view
-        print(self.view.title, 'focuson')
         self.view.focusOn()
-
     def setViewWithArg(self, view, arg):
         self.view = view
         self.view.focusOnWithArg(arg)
@@ -237,89 +214,75 @@ class CropDevMain:
         self.view.btn4Press()
     def upArrowPress(self):
         print('UP')
-        if not self.view.hasMsg():
-            self.view.upArrowPress()
+        self.view.upArrowPress()
     def downArrowPress(self):
         print('DOWN')
-        if not self.view.hasMsg():       
-            self.view.downArrowPress()
+        self.view.downArrowPress()
     def leftArrowPress(self):
         print('LEFT')
-        if not self.view.hasMsg():
-            self.view.leftArrowPress()
+        self.view.leftArrowPress()
     def rightArrowPress(self):
         print('RIGHT')
-        if not self.view.hasMsg():
-            self.view.rightArrowPress()
+        self.view.rightArrowPress()
+    
+    
     def exit(self):
-#         if self.test.testing:
-#             return
-        self.hd.closeConnection()
         self.running = False
-        pg.quit()
+#         import subprocess
+#         command = "sudo python3 /home/pi/Desktop/StalkPusher/gui/main/cropDev.py &"
+#         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+#         
+#         output = process.communicate()[0]
+#         quit()
+#        
+# 
+#         print(output)
         
     def restartSoftware(self):
         self.hd.closeConnection()
-        pg.quit()
         """Restarts the current program.
         Note: this function does not return. Any cleanup action (like
         saving data) must be done before calling this function."""
         python = sys.executable
-        #probably fork process, then execute
         os.execl(python, python, * sys.argv)
 
 
     def restartPi(self):
-#         if self.test.testing:
-#             return
-
         self.hd.closeConnection()
-#         command = "/usr/bin/sudo /sbin/shutdown -r now"
-        command = "reboot"
-
+        command = "/usr/bin/sudo /sbin/shutdown -r now"
         import subprocess
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
         output = process.communicate()[0]
         print(output)
     def shutdownPi(self):
-#         if self.test.testing:
-#             return
         self.hd.closeConnection()
-        pg.quit()
-
-#         command = "/usr/bin/sudo /sbin/shutdown -h now"
-        command = "shutdown -h now"
+        command = "/usr/bin/sudo /sbin/shutdown -h now"
         import subprocess
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
         output = process.communicate()[0]
         print(output)
     def takeScreenshot(self):
-        if not os.path.isdir(d.SCREENSHOT_PATH):
-            #the tests folder does not exist ont he usb
-            os.makedirs(d.SCREENSHOT_PATH)
-#             os.chmod(d.SCREENSHOT_PATH, d.RW_PERM_A)#read write by anyone
-        from utils import misc
-#         misc.osCommand('mkdir /home/pi/Documents/nonsudoed')
-# 
-#         misc.osCommand('sudo mkdir /home/pi/Documents/sudoed')
+        PATH = '/home/pi/Pictures/CropDev'
         fileName = 'screenshot'
-        writePath = os.path.join(d.SCREENSHOT_PATH, fileName)
+        writePath = PATH + '/' + fileName
+        if not os.path.exists(PATH):
+            #the tests folder does not exist ont he usb
+            os.makedirs(PATH)
         
-        if os.path.exists(writePath + d.SCREENSHOT_FORMAT):
+        if os.path.exists(writePath + '.jpg'):
             i = 2
-            while os.path.exists(writePath + str(i) + d.SCREENSHOT_FORMAT):
+            while os.path.exists(writePath + str(i) + '.jpg'):
                 i+=1
             writePath = writePath + str(i)
        
         rect = pg.Rect(0, 0, d.width, d.height)
         sub = self.disp.subsurface(rect)
-        pg.image.save(sub, writePath + d.SCREENSHOT_FORMAT)
-#         os.chmod(writePath + d.SCREENSHOT_FORMAT, d.RW_PERM_A)#read write by anyone
-
-        print('wrote screenshot to', writePath + d.SCREENSHOT_FORMAT)
+        pg.image.save(sub, writePath + '.jpg')
 
 if __name__ == '__main__':
 #     cropDevErrorLogFile = open('/home/pi/Desktop/cropDevErrorLogFile.txt', 'a+')
 #     sys.stderr = cropDevErrorLogFile
     mw = CropDevMain()
+    pg.quit()
+    mw.hd.closeConnection()
     quit()

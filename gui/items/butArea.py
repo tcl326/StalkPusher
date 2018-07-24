@@ -28,12 +28,6 @@ class ButArea:
             # except Exception as e:
             #     self.btns.append(None)
                 # print ('Button appending error', str(e))
-                
-    def switchBtn(self, i, btnDef):
-        if i > 3: return
-        self.btns[i] = b.Button(self.app, btnDef, d.btnAreaGeo[i])
-        self.app.updateScreen()
-        
     def display(self):
         for btn in self.btns:
             try:

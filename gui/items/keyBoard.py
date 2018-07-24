@@ -58,14 +58,12 @@ class Keyboard:
 
     def leftArrowPress(self):
         self.keys[self.focusNum].setFocus(False)
-#         self.focusNum = ((self.focusNum - 1) % (len(self.chars) - (self.columns * (self.focusNum // self.columns)))) % (self.columns) + (self.focusNum // self.columns) * self.columns
         self.focusNum = (self.focusNum - 1) % self.columns + (self.focusNum // self.columns) * self.columns
-#         self.focusNum = ((self.focusNum - 1) % self.columns + (self.focusNum // self.columns) * self.columns) % len
         self.keys[self.focusNum].setFocus(True)
 
     def rightArrowPress(self):
         self.keys[self.focusNum].setFocus(False)
-        self.focusNum = ((self.focusNum + 1) % len(self.chars)) % self.columns + (self.focusNum // self.columns) * self.columns
+        self.focusNum = (self.focusNum + 1) % self.columns + (self.focusNum // self.columns) * self.columns
         self.keys[self.focusNum].setFocus(True)
 
 #     def upArrowPress(self):
