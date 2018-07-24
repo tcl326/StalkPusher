@@ -19,7 +19,7 @@ class LiveFeedView(v.View):
         self.btnDefs = [(
                 {'label': 'STOP/\nSTART', 'id': 'bckbtn', 'funct': self.uPause},
                 {'label': 'ADC', 'id': 'bckbtn', 'funct': self.toADC},
-                {'label': 'Except', 'id': 'bckbtn', 'funct': self.throwExc},#'label': 'Except', 'id': 'bckbtn', 'funct': self.throwExc
+                {},#'label': 'Except', 'id': 'bckbtn', 'funct': self.throwExc},#'label': 'Except', 'id': 'bckbtn', 'funct': self.throwExc
                 {'label': 'BACK', 'id': 'bckbtn', 'funct': self.back},
             ),
             (
@@ -31,15 +31,15 @@ class LiveFeedView(v.View):
             ]
         
         self.stnBtnDefs = (
-            {'label': 'TEMPERATURE', 'funct': None},
+            {'label': 'TEMP.', 'funct': None},
             {'label': 'HUMIDITY', 'funct': None},
             {'label': 'LOCATION', 'funct': None},
             {'label': 'TIME', 'funct': None},
             {'label': 'X LOAD', 'funct': None},
             {'label': 'Y LOAD', 'funct': None},
-            {'label': 'POT. ROTATION', 'funct': None},
-            {'label': 'IMU ROTATION', 'funct': None},
-            {'label': 'ARDUINO TIME', 'funct': None}
+            {'label': 'POT. ANGLE', 'funct': None},
+            {'label': 'IMU ANGLE', 'funct': None},
+            {'label': 'CPU TIME', 'funct': None}
 
         )
         self.title = 'LIVE FEED'
@@ -153,6 +153,9 @@ class LiveFeedView(v.View):
     
     #overriden    
     def convertedVector(self, vector, dataType):
+        #vector is actually always a string
+        if vector == d.NUL_ARD_IN:
+            return vector
         (a, b, unit) = self.getABUnit(dataType)
         try:
             retVal = (float(vector)-b)/a
@@ -160,7 +163,8 @@ class LiveFeedView(v.View):
             return retVal
         except Exception as e:
             print('invalid temp data in', vector, str(e))
-            
+            return str(vector)
+        
     def setLabel(self, label, value):
         if type(value) == type(0.0):
             value = str("%0.2f" % value)
@@ -171,7 +175,7 @@ class LiveFeedView(v.View):
    
     def timeIn(self, year, month, day, hour, minute, second, millis):
         super().timeIn(year, month, day, hour, minute, second, millis)
-        value = hour+':'+str(minute)+':'+str(second)+'.'+str(millis)+', '+ str(day)+'/'+str(month)+'/'+str(year)
+        value = hour.zfill(2)+':'+minute.zfill(2) +' ' + day.zfill(2)+'/'+month.zfill(2)
         self.setLabel('TIME', value)
     
     def locationIn(self, x, y):
@@ -185,7 +189,7 @@ class LiveFeedView(v.View):
     def temperatureIn(self, value):
         if not self.focusNum:
             value = self.convertedVector(value, d.DS_TEMP)
-        self.setLabel('TEMPERATURE', value)
+        self.setLabel('TEMP.', value)
     def humidityIn(self, value):
         if not self.focusNum:
             value = self.convertedVector(value, d.DS_HUM)
@@ -195,11 +199,11 @@ class LiveFeedView(v.View):
     def anglePotIn(self, value):
         if not self.focusNum:
             value = self.convertedVector(value, d.DS_POT)
-        self.setLabel('POT. ROTATION', value)
+        self.setLabel('POT. ANGLE', value)
     def angleImuIn(self, value):
         if not self.focusNum:
             value = self.convertedVector(value, d.DS_IMU)
-        self.setLabel('IMU ROTATION', value)
+        self.setLabel('IMU ANGLE', value)
     def forceXIn(self, value):
         if not self.focusNum:
             value = self.convertedVector(value, d.DS_LOAD_X)
@@ -209,7 +213,7 @@ class LiveFeedView(v.View):
             value = self.convertedVector(value, d.DS_LOAD_Y)
         self.setLabel('Y LOAD', value)
     def millisIn(self, value):
-        self.setLabel('ARDUINO TIME', value)
+        self.setLabel('CPU TIME', value)
 
 
 #     class SettingBtn:

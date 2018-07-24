@@ -71,20 +71,27 @@ class EditSensorView(v.View):
         if key == d.SENSOR_A or key == d.SENSOR_B:
             try:
                 value = float(value)        
-                self.sensorData[key] = value
-                self.initLists()
+#                 self.sensorData[key] = value
+#                 self.initLists()
             except:
                 self.pushMsg(msg.Message(self.app, self, self.disp,
                                         'Invalid data',
                                         'Input must be a valid numerical value. Retry',
                                         btnDefs = (
                                             {'label': 'OK', 'id': 'yesBtn', 'funct': self.popMsg},
-                                            {'label': 'RETRY', 'id': 'yesBtn', 'funct': self.popMsg},
+                                            {'label': 'RETRY', 'id': 'yesBtn', 'funct': (self.popMsg, self.editField)},
                                             {},
                                             {}
                                         )
                                         )
                              )
+                return
+        elif key == d.SENSOR_UNIT:
+           pass 
+        self.sensorData[key] = value
+        self.initLists()
+            
+            
                 
     def saveSensor(self):
         #make it more efficient - access only needed data fields

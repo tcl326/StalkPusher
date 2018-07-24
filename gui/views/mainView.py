@@ -202,6 +202,10 @@ class MainView(v.View):
 #             #display number
 #             self.disp.blit(self.txt, (self.txt.get_rect(center=(self.x, self.y))))
     def exitBtn(self):
+        
+        if self.app.test is not None:
+            if self.app.test.testing:
+                return
         from items import message as ms
         self.pushMsg(ms.Message(self.app, self, self.disp,
                                 'EXITING',

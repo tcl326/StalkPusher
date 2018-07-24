@@ -7,6 +7,7 @@ import defs as d
 import serial
 import threading as thr
 import time as t
+import os
 import re
 #commands and special chars
 PER_CALL = 'PCLL'
@@ -53,12 +54,25 @@ MAX_CONN_TRIES = 1
 CONN_TIMEOUT = 3
 class HardWare:
     def __init__(self, app):
+        self.lastPerCall = t.time()
         self.lastIn = t.time()
         self.threadLock = app.threadLock#thr.Lock()
         self.app = app
         self.connected = False
         self.initConnThread()
     def initConnThread(self):
+        
+        if os.path.exists(d.SERIAL_LOG_FILE + d.LOG_FORMAT):
+            logPath = d.SERIAL_LOG_FILE
+            i = 2
+            while os.path.exists(logPath +'(' + str(i) + ')' + d.LOG_FORMAT):
+                i+=1
+            logPath = logPath +'(' + str(i) + ')' + d.LOG_FORMAT
+        else:
+            logPath = d.SERIAL_LOG_FILE + d.LOG_FORMAT
+            
+#         self.logFile = open(logPath,'a')
+
         connThread = thr.Thread(target = self.establishConnection)
         connThread.setName('CONNECTION THREAD')
         connThread.daemon = True
@@ -106,9 +120,11 @@ class HardWare:
                     print('serial USB 1 establish error:', str(e))
         self.connectionFailed()
     def closeConnection(self):
+#         self.logFile.close()
+        print('closeConnection()')
         if self.arduino is not None:
             self.stopReadThread()
-            self.stopStream()
+#             self.stopStream()
             self.connected = False
             self.arduino.close()
             self.arduino = None
@@ -149,27 +165,35 @@ class HardWare:
         while self.readFromSerial:
             #if self.app.streaming:
             ard_input = self.readFromArd()
-#             print('READ THREAD: A' + ard_input + 'A ' + str(t.time() - self.lastIn))
+#             print('READ THREAD: |' + ard_input + '|')
 
             if len(ard_input) > 0:
+#                 self.logFile.write('READ: |' + ard_input + '|\n')
+#                 if not self.app.streaming:
+#                     print('not self.app.streaming: |' + ard_input + '|')
                  
-#                 print('ard input' +ard_input)
+#                 print('READ THREAD: |' + ard_input + '|')
                 #check if acknowledgement
                 if re.match(ACK_COMM, ard_input) != None:        #check if dataIn
                     #we have an acknowledgement
-                    print('ACKNOWLEDGEMENT: |' + ard_input + '|')                    
+#                     print('ACKNOWLEDGEMENT: |' + ard_input + '|')
+#                     print('T diff', t.time() - self.lastPerCall)   
+                
+                                     
                     ack_comm = re.findall(ACK_COMM, ard_input)[0]
                     self.parseAck(ack_comm)
                 elif re.match(DATA_IN_COMM, ard_input) != None:
 #                     print('DATA IN: |' + ard_input + '|')
-                     
+#                     if not self.app.streaming:
+#                         print('T diff 2', t.time() - self.lastPerCall)                    
+#                         self.lastPerCall = t.time()
                     if self.app.view is not None:
                         self.parseData(ard_input)
                     else:
                         if not self.isConnected():
                             self.connectionConfirmed()
                 else:
-                    print('NOT DATA IN: |' + ard_input + '|')
+#                     print('NOT DATA IN: |' + ard_input + '|')
                     pass
                 #t.sleep(0.01)
 #             print('4a')
@@ -233,7 +257,7 @@ class HardWare:
         #print('processing data')
         #print('tag: '+data[0]+ ', value: '+ data[1])
         tag = data[0]
-        value = data[1]
+        value = data[1].strip()
         if tag == TI:
             # 'Time: 23:16:15.999Date: 15/12/2017'
             [timeHeader, time, date] = value.split(' ')
@@ -278,6 +302,7 @@ class HardWare:
     def getLocation(self):
         self.getPerCall(loc = '1')
     def getAll(self):
+        self.lastPerCall = t.time()
         self.getPerCall('1','1','1','1')
     def getPerCall(self, temp = '0', hum = '0', loc ='0', time ='0'):
         command =  PER_CALL+time +loc + hum + temp
@@ -302,13 +327,22 @@ class HardWare:
         #self.writeToArd(ardCommand)
     def writeToArd(self, comm):
         with self.threadLock:
-            if self.arduino is not None:
+            try:
+#             if self.arduino is not None:
                 print('Writing command of length ' +str(len(comm))+':', comm)
+#                 self.logFile.write('WRITE: |' + comm + '|\n')
+
                 self.arduino.flushInput()
                 self.arduino.flushOutput()
                 self.arduino.write((comm + '\n').encode('utf-8'))
-            else:
-                print('Arduino is none. Cannot write command of length ' +str(len(comm))+':', comm)
+#             else:
+            except Exception as e:
+                print('Cannot write command of length ' +str(len(comm))+': ' + comm + '. Error:', str(e))
+#                 print('Arduino is none. Cannot write command of length ' +str(len(comm))+':', comm)
+                if self.app.running:
+                    self.closeConnection()
+                    self.initConnThread()
+
                 
     def readFromArd(self):
         with self.threadLock:

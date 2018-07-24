@@ -6,7 +6,10 @@ ttlProp = 0.2 #proportion of y space taken by title rect
 class Message:
     def __init__(self, app, view, disp, ttlTxt, msgTxt,
                   geoData = {'x':62.5*d.px, 'y': 50*d.py, 'xdim': 70*d.px, 'ydim': 50*d.py},
-                  btnDefs = None):
+                  btnDefs = None,
+                  ttlData = None,
+                  bdData = None
+                  ):
         
         self.app = app
         self.disp = disp
@@ -33,6 +36,14 @@ class Message:
         bdDim= self.ydim - ttlYdim
         bdY = self.y + (self.ydim-bdDim)/2
         
+        
+        
+        if bdData is not None:
+            bdFont = bdData['font']
+        else:
+            bdFont = self.app.msgBdFont
+        
+        
         self.ttlRect = rl.RectLabel(app=self.app,
                                     pos = (self.x, ttlY),
                                     dim = (70*d.px, ttlYdim),
@@ -50,7 +61,7 @@ class Message:
                                     pos = (self.x, bdY),
                                     dim = (70*d.px, bdDim),
                                     text = self.msgTxt,
-                                    font = self.app.msgBdFont,
+                                    font = bdFont,
 #                                     fontCol = d.font_col_inv,
 #                                     bcgCol = d.brightenColor(self.app.textView_col)
                                     txtMode = 'mpta',

@@ -93,10 +93,17 @@ class BtnInput():
                 if not self.btnPresses[self.gpioBtnMap[button.pin]]:
 #                     print('csetting press to true for btn: ' + str(self.gpioBtnMap[button.pin]))
 
-                    self.btnPresses[self.gpioBtnMap[button.pin]] = True       
+                    self.setBtnByPin(button.pin)       
 
 #                     if self.app.view is not None:
 #                         self.btnFunctMap[gpioBtnMap[button.pin]]()
+    def setBtnByPin(self, pin):
+        assert pin in btnPins
+        self.btnPresses[self.gpioBtnMap[pin]] = True       
+
+    def setBtnByNum(self, num):
+        assert num < 8
+        self.btnPresses[num] = True       
 
     class Button:
         def __init__(self, pin):

@@ -14,10 +14,14 @@ from items import rectLabel as rl
 from utils import text as txt
 from utils import postProcess as pp
 from items import viewBtn as vb
+
+def cmp(a, b):
+    return not (a > b) - (a < b) 
+
 class TestFileView(v.View):
-    def __init__(self, app, path, prevView = None):
+    def __init__(self, app, path, graph, prevView = None):
         splitPath = path.split('/')
-        self.title = 'Test file: /' + splitPath[-2] + '/' + splitPath[-1]
+        self.title = splitPath[-2] + '/' + splitPath[-1][:-4]#dont want to have .csv in title
         self.btnDefs = [
                 (
                     {'label':'SELECT', 'id':'selectBtn', 'funct':self.selectBtn},
@@ -27,6 +31,8 @@ class TestFileView(v.View):
                 )
             ]
         self.filePath = path
+#         print('VIEWED FILE PATH', self.filePath)
+
         super().__init__(app, prevView)
 #         self.mode = preTest
         self.numBtnX = self.cax
@@ -35,7 +41,8 @@ class TestFileView(v.View):
         self.drawPots = False
         self.drawXY = False
         
-        self.startGraph()
+        self.graph = graph
+#         self.startGraph()
         self.redrawGraph()
         self.initLayout()
     def setPostItemFocusNum(self, num):
@@ -62,7 +69,7 @@ class TestFileView(v.View):
                                     label = 'Load',
                                     value = 'F',
                                     funct = self.switchLoadMode,
-                                    focus = False,
+                                    focus = True,
                                     formating = lambda lab, val: lab+ ': ' + str(val)
                                     )
                           )
@@ -82,6 +89,9 @@ class TestFileView(v.View):
 #         self.postItems.append(self.SettingBtn(self.app, {'x': self.cax+10*d.px, 'y': self.cay + 40 * d.py},
 #                                   self.postStnBtnDefs[1], False, (15 * d.px, 10*d.py)))
 
+    def goBack(self):
+#         self.graph.close()
+        super().goBack()
     def readVectors(self):
         
         csv_file = open(self.filePath, 'r')
@@ -93,18 +103,23 @@ class TestFileView(v.View):
         self.loads = np.array([])
         self.anglePots = np.array([])
         self.angleImus = np.array([])
-        i = 1
-        for line in csv_file:
-            print(line)
-            if i>=18:
-                [angle_pot, angle_imu, load_x, load_y, time] = line.split(',')
+        
+        temp = csv_file.read().splitlines()
+        readIn = False
+        for line in temp:
+            if not readIn:
+                headers = line.split(',')
+                if len(headers)>0 and cmp(headers, d.testHeaders):
+                    readIn = True
+                    continue
+            else:
+                [time, angle_pot, angle_imu, load_x, load_y] = line.split(',')
                 self.times = np.append(self.times, float(time))
                 self.loadsX = np.append(self.loadsX, float(load_x))
                 self.loadsY = np.append(self.loadsY, float(load_y))
                 self.anglePots = np.append(self.anglePots, float(angle_pot))
                 self.angleImus = np.append(self.angleImus, float(angle_imu))
-            i+=1
-            
+
         self.loads = np.sqrt(self.loadsX**2 + self.loadsY**2)
            
     def selectBtn(self):
@@ -184,12 +199,10 @@ class TestFileView(v.View):
     def switchLoadMode(self):
         self.drawXY = not self.drawXY
         self.postItems[-2].setValue('XY'if self.drawXY else 'F')
-        self.postItems[-2].setTxt()        
         self.redrawGraph()
     def switchRotMode(self):
         self.drawPots = not self.drawPots
         self.postItems[-1].setValue('Pot.'if self.drawPots else 'IMU')
-        self.postItems[-1].setTxt()        
         self.redrawGraph()
 
     def startGraph(self):

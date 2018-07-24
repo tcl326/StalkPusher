@@ -29,7 +29,7 @@ itemsAvImg = pg.transform.scale(itemsAvImg, (int(4*d.px), int(1*d.px)))
 
 
 class NoteList():
-    def __init__(self, app, disp, geoData, list = None, listName='', hasFocus=False, maxNotes = 50):
+    def __init__(self, app, disp, geoData, list = None, listName='', hasFocus=False, maxNotes = -1):
         self.app = app
         self.disp = disp
         self.x = geoData['x']
@@ -39,9 +39,9 @@ class NoteList():
         self.listName = listName
         self.maxNotes = maxNotes
         if list is not None:
-            self.list = list
+            self.list = list[:]
         else:
-            self.list = self.app.getSetting(self.listName)
+            self.list = self.app.getSetting(self.listName)[:]#make sure the list is a copy
         self.focusNum = 0
         self.determineLayout()
         # self.setFocus(hasFocus)
@@ -49,11 +49,27 @@ class NoteList():
         self.addNotes()
 
         self.addTtlRect()
+
+    def checkIntegrity(self):
+        if self.listName != '':
+#             print('list name is there')
+            newList = self.app.getSetting(self.listName)
+#             print(self.list, newList)
+            if set(self.list) != set(newList):
+#                 print('they are not the same set')
+                self.focusNum = 0
+                self.list = newList
+                self.resetIndices()                                     
+                self.addNotes()
+#     def update(self):
+#         self.resetIndices()                                     
+#         self.addNotes()
+        
 #     @classmethod
 #      def fromListName(cls, app, disp, geoData, listName, hasFocus):
 #          list = app.getSetting(self.listName)
 #          return cls(app, disp, geoData, list, hasFocus)
-    
+#         print('---------------------')    
     def addTtlRect(self):
         self.ttlRect = rl.RectLabel(app=self.app,
                                     pos = (self.x, self.y-self.ydim /2 - 8*d.py),
@@ -76,13 +92,15 @@ class NoteList():
 #             )
 #         self.ttlRect.setFontCol(d.font_col_inv)
     def getItem(self):
-        return self.list[0] if len(self.list) ==1 else self.list[self.focusNum]
+        return None if not len(self.list) else self.list[0] if len(self.list) ==1 else self.list[self.focusNum]
     def saveList(self):
-        d.saveSetting(self.listName, self.list)
+        assert self.list is not None
+        assert self.listName != ''
+        self.app.saveSetting(self.listName, self.list)
     def isEmpty(self):
         return not self.list
     def isFull(self):
-        return len(self.list) >= self.maxNotes
+        return False if (self.maxNotes < 0) else (len(self.list) >= self.maxNotes)
     def setFocus(self, focus):
         # if self.hasFocus != focus:
         self.hasFocus = focus
@@ -93,7 +111,10 @@ class NoteList():
         else:
             if not self.isEmpty():
                 self.notes[self.focusNum].setFocus(False)
-        
+    def resetIndices(self):
+        self.startIndex = 0
+        self.endIndex = min(len(self.yNoteCents)-1, len(self.list)-1)
+            
     def determineLayout(self):
         self.noteHeight = 5*d.py
         self.interNoteSpace = 1*d.py
@@ -107,7 +128,7 @@ class NoteList():
 
         self.startIndex = 0
         self.endIndex = min(len(self.yNoteCents)-1, len(self.list)-1)
-        
+
         self.itemsAvUplbl = rl.RectLabel(app = self.app,
                                          pos = (self.x, self.yNoteCents[0]- self.noteHeight - self.interNoteSpace),
                                          dim = (self.xdim, self.noteHeight),
@@ -145,15 +166,19 @@ class NoteList():
                                         {'x': self.x,'y': self.y,'xdim': self.xdim,'ydim': self.noteHeight},
                                         {'txt':self.list[i], 'txtDim': 3*d.px},
                                         self.focusNum == i and self.hasFocus))
-        self.itemsAvDownlbl.setText('+'+str(len(self.list)-self.endIndex-1)+'...')
+        self.reSetItemsAv()
 
     def printInfo(self):
-        print('yNoteCents:',len(self.yNoteCents),'start:',self.startIndex, 'end:', self.endIndex, 'focusNum:', self.focusNum)
+        print('yNoteCents:',len(self.yNoteCents), 'len(self.lists)', len(self.list),
+              'len(self.notes)', len(self.notes),
+              'start:',self.startIndex, 'end:', self.endIndex, 'focusNum:', self.focusNum)
+        pass
     def reSetItemsAv(self):
         self.itemsAvUplbl.setText('+'+str(self.startIndex)+'...')           
         self.itemsAvDownlbl.setText('+'+str(len(self.list)-self.endIndex-1)+'...')
         
     def prependNote(self, noteContent):
+        assert noteContent is not None
         self.list.insert(0, noteContent)
         self.notes.insert(0, self.Note(self.app,
                                         {'x': self.x,'y': self.y,'xdim': self.xdim,'ydim': self.noteHeight},
@@ -195,6 +220,7 @@ class NoteList():
         self.app.updateScreen()
 
     def appendNote(self, noteContent):
+        assert noteContent is not None
         self.list.append(noteContent)
         self.notes.append(self.Note(self.app,
                                         {'x': self.x,'y': self.y,'xdim': self.xdim,'ydim': self.noteHeight},
@@ -209,7 +235,7 @@ class NoteList():
         self.app.updateScreen()
 
     def removeNote(self):
-        if self.isEmpty(): return
+        assert self.focusNum < len(self.list)        
         noteContent = self.list[self.focusNum]
         if len(self.notes) - self.startIndex <= len(self.yNoteCents):# self.endIndex - self.startIndex <= len(self.yNoteCents):
             self.endIndex -=1
@@ -233,6 +259,7 @@ class NoteList():
     def display(self):
         #display background rec
         #display each note
+#         self.printInfo()
         self.ttlRect.display()
         for i in range(len(self.yNoteCents)):
             if i>=len(self.list):
@@ -245,7 +272,6 @@ class NoteList():
         if self.endIndex != len(self.list) -1:
             self.itemsAvDownlbl.display()
             # self.disp.blit(itemsAvImg, img.getLeftUp(itemsAvImg, self.x, self.yNoteCents[-1] + self.noteHeight))
-
     def upArrowPress(self):
         if self.isEmpty(): return
         if self.focusNum == self.startIndex:
@@ -292,6 +318,9 @@ class NoteList():
             if item == self.list[ind]:
                 self.notes[ind].select()
                 break
+    def deSelectAll(self):
+        for note in self.notes:
+            note.deselect()
     def getSelected(self):
         selNotes = []
         for note in self.notes:

@@ -27,7 +27,7 @@ class PlotSettingView(v.View):
         # self.app.setView(sv.SettingsView(self.app))
 
     def startNumChoice(self):
-        self.numChoice = nc.NumChoice(self.app,self.disp,{'value':'testPlot','unit':'#', 'numDigits':5, 'unitPos': 'prefix'}, {'x':self.cax, 'y':self.cay})
+        self.numChoice = nc.NumChoice(self.app,self.disp,{'value':'testPlot','unit':'#', 'numDigits':6, 'unitPos': 'prefix'}, {'x':self.cax, 'y':self.cay})
     def display(self):
         super().display()
         self.numChoice.display()

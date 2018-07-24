@@ -39,20 +39,6 @@ class KeyboardView(v.View):
                                   text = self.input + ' ' + self.suffix,
                                   font = self.app.nlFont,
                                   )
-#         self.inputRect = rl.RectLabel(
-#             self.app,
-#             {
-#                 'x':self.cax,
-#                 'y':self.cay-24*d.py,
-#                 'xdim':58*d.px,
-#                 'ydim':8*d.py
-#             },
-#             {
-#                 'txt':self.input + ' ' + self.suffix,
-#                 'txtDim': 5*d.px,
-#                 'color': self.app.textView_col
-#             }
-#         )
         self.initKeyBoard(type)
     def initKeyBoard(self, type):
         if type == d.NUM:
@@ -75,6 +61,17 @@ class KeyboardView(v.View):
                  'ydim':56*d.py
                  }
             )
+        elif type == d.ALPHA:
+            from items import keyboardAlpha as kba
+            self.keyBoard = kba.KeyboardAlpha(
+                self.app,
+                {'x':self.cax,
+                 'y':self.cay+20*d.py,
+                 'xdim':72*d.px,
+                 'ydim':56*d.py
+                 }
+            )
+
             
     def displayView(self):
         self.keyBoard.display()

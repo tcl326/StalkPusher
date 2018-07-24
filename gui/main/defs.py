@@ -15,7 +15,7 @@ def readSettingFromFile(file_path):
     with open(file_path, 'r') as data_file:
         data = json.load(data_file)
         return data
-
+    
 #return a given setting
 def getSetting(setting):
     import json
@@ -31,34 +31,60 @@ def saveSetting(setting, value):
         data_file.seek(0)
         json.dump(data, data_file,indent=4)
         data_file.truncate()
+def saveSettingsObject(settingsObject):
+    import json
+    with open(setting_file_path, 'r+') as data_file:
+        data_file.seek(0)
+        json.dump(settingsObject, data_file,indent=4)
+        data_file.truncate()
+    
 #for parsing date
 TIME_DEL = '_'
 HOUR_DEL = ':'
 MILLIS_DEL = '.'
+#invalid arduino input
+NUL_ARD_IN = 'NAN'
 #constant units (for saving to file, mainly)
 HEIGHT_UNIT = 'cm'
 TIME_UNIT = 'UTC'
 PLOT_UNIT = '#'
 GPS_UNIT = 'angular degrees'
+#formats
+TEST_FILE_FORMAT = '.csv'
+SCREENSHOT_FORMAT = '.jpg'
+LOG_FORMAT = '.txt'
 #default test name
 TEST_FILE_NAME = 'test'
-# if __name__ == "__main__":
+#save wait time timeout in seconds
+SAVE_TIMEOUT = 2
+SAVE_BTN_DELAY = 1
+#critical dir names
+STALK_PUSHER_DIR = 'StalkPusher'
+TESTS_DIR = 'tests'
+UPDATE_DIR = 'update'
 #critical paths
-APP_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))#../gui/
-MAINAPP_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)))#../gui/main/
-
+DESKTOP_PATH = '/home/pi/Desktop'
+APP_PATH = '/home/pi/Desktop/StalkPusher/gui'#os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))#../gui/
+MAINAPP_PATH = '/home/pi/Desktop/StalkPusher/gui/main'#os.path.join(os.path.dirname(os.path.realpath(__file__)))#../gui/main/
 USB_DATA_PATH = '/home/pi/Documents/cropDevUsb'#'/media/cropDevUsb'#'../tests'
-RASPI_DATA_PATH = '/home/pi/Documents/cropDevUsb'#'../tests'
-TESTS_DIR = '/tests'
-UPDATE_DIR = '/update'
-
+RASPI_DATA_PATH = '/home/pi/Documents/cropDevSd'#'../tests'
+SCREENSHOT_PATH = '/home/pi/Pictures/CropDevScreens'
+#updates
+UPDATE_DATA_FILE = 'updateData.json'
+UPDATE_SCRIPT_FILE = 'updateScript.py'
 #setting file
-setting_file_path = MAINAPP_PATH + '/appData.json'
+setting_file_path = '/home/pi/Desktop/StalkPusher/gui/main/appData.json'
+#error log files
+ERROR_LOG_FILE = '/home/pi/Desktop/cropDevErrorLogFile.txt'
+TEST_ERROR_LOG_FILE = '/home/pi/Desktop/cropDevTestErrorLogFile.txt'
+SERIAL_LOG_FILE = '/home/pi/Desktop/cropDevSerialLogFile'#.txt'
 
+#permissions
+RW_PERM_A = '766'#read write all users
 # Screen Geometry
 #in pixels
 pg.init()
-FULLSCREEN =0
+FULLSCREEN = 1
 infoObject = pg.display.Info()
 width = infoObject.current_w
 height = infoObject.current_h
@@ -100,7 +126,7 @@ caYDim = 100*py
 caGeo = {'x': 62.5*px,'y':50*py,'xdim':caXDim-2*xMargin,'ydim':caYDim-2*yMargin}
 
 #btnArea geo
-btnXdim = 25*px
+btnXdim = 26*px
 btnYdim = 25*py
 btnAreaGeo = [{'x':12.5*px,'y':12.5*py,'xdim':btnXdim-2*xMargin,'ydim':btnYdim-2*yMargin},
        {'x':12.5*px,'y':37.5*py,'xdim':btnXdim-2*xMargin,'ydim':btnYdim-2*yMargin},
@@ -112,9 +138,10 @@ BTN_FS = int(3.8*px)
 VIEW_TTL_FS = int(6*px)
 NL_FS = int(3.6*px)
 LV_VB_FS = int(3.2*px)
-STN_BTN_FS = int(3.8*px)
-MSG_TTL_FS = int(4.4*px)
-MSG_BD_FS = int(3.4*px)
+STN_BTN_FS = int(3.6*px)
+MSG_TTL_FS = int(4.6*px)
+MSG_BD_FS = int(3.8*px)
+CONF_MSG_BD_FS = int(4.4*px)
 KB_KEY_FS = int(3.8*px)
 NK_FS = int(4*px)
 
@@ -168,10 +195,11 @@ testNote = ''
 testNotes = []
 noteBank = []
 #test saving
-testHeaders = ['PLOT', 'HEIGHT', 'PRE_TEST_NOTES', 'POST_TEST_NOTES', 'ANGLES', 'LOADS', 'TIMES']
+testHeaders = ['TIME', 'ANGLE_POT', 'ANGLE_IMU', 'LOAD_X', 'LOAD_Y']
 #keyboard: num or word?
 NUM = 'NUM'
 WORD = 'WORD'
+ALPHA = 'ALPHA'
 
 MAX_NOTES = 5 #max notes per test
 
@@ -190,6 +218,88 @@ arrow_col = white#red # org light_blue
 nlWrapper_col = white
 msgHeader_col = white
 msgBody_col = light_gray
+#default settings
+DEF_STN_NUM = 0
+DEF_STN_STR = 'N/A'
+DEF_SENSORS = {
+        "POT": "pot1",
+        "LOAD_X": "loadx1",
+        "HUM": "hum1",
+        "TEMP": "temp1",
+        "IMU": "imu1",
+        "LOAD_Y": "loady1"
+    }
+DEF_SENSORBANK = {
+        "POT": {
+            "pot1": {
+                "unit": "Deg",
+                "b": 0.0,
+                "a": 5400.0,
+                "last": "2017-05-20,10:43"
+            }
+        },
+        "LOAD_X": {
+            "loadx1": {
+                "unit": "N",
+                "b": 0.0,
+                "a": -120.0,
+                "last": "2017_7_9_11:39:30"
+            },
+        },
+        "HUM": {
+            "hum1": {
+                "unit": "%",
+                "b": 0.0,
+                "a": 1.0,
+                "last": "2017-05-20,10:43"
+            }
+        },
+        "TEMP": {
+            "temp1": {
+                "unit": "C",
+                "b": 0.0,
+                "a": 1.0,
+                "last": "2017-05-20,10:43"
+            }
+        },
+        "IMU": {
+            "imu1": {
+                "unit": "Deg",
+                "b": 0.0,
+                "a": 1.0,
+                "last": "2017-05-20,10:43"
+            }
+        },
+        "LOAD_Y": {
+            "loady1": {
+                "unit": "N",
+                "b": 0.0,
+                "a": -120.0,
+                "last": "2017_7_9_10:39:40"
+            }
+        }
+    }
+DEF_COLORS ={
+        "font_col": [0,0,0],
+        "textView_col": [255,255,255],
+        "bcg_col": [0,0,0]
+    }
+
+DEF_STN_MAP = {
+    TEST_HEIGHT: 150,
+    TEST_PLOT: 1,
+    PRE_TEST_NOTES: [],
+    POST_TEST_NOTES: [],
+    NOTE_BANK: [],
+    TEST_FOLDER: 'TESTDIR',
+    SENSORS: DEF_SENSORS,
+    SENSOR_BANK: DEF_SENSORBANK,
+    COLORS: DEF_COLORS,
+    DATA_CONFIRM_FREQ: 200,
+    MAX_START_ANGLE: 5,
+    VERSION: '1.0.0',
+    OPERATOR: DEF_STN_STR
+    }
 #conversion from 0-255 RGB to 0-1 RGB
 def convertColor(color):
     return (x/255.0 for x in color)

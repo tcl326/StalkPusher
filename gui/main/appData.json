@@ -1,16 +1,90 @@
 {
-    "dataConfirmFreq": 200,
-    "operator": "CHRISTOPHER",
+    "sensorBank": {
+        "HUM": {
+            "WED": {
+                "unit": "WEE",
+                "b": "NaN",
+                "a": "NaN",
+                "last": "2017_7_13_9:26:17"
+            },
+            "hum1": {
+                "unit": "%",
+                "b": 0.0,
+                "a": 1.0,
+                "last": "2017_7_12_11:6:17"
+            }
+        },
+        "LOAD_Y": {
+            "loady1": {
+                "unit": "N",
+                "b": -7.717966736940737,
+                "a": 0.003992844822078836,
+                "last": "2017_7_11_13:36:23"
+            }
+        },
+        "POT": {
+            "pot1": {
+                "unit": "Deg",
+                "b": 2514.430069930071,
+                "a": -0.07692307692308467,
+                "last": "2017-05-20,10:43"
+            }
+        },
+        "LOAD_X": {
+            "TEST": {
+                "unit": "CM",
+                "b": -5.018552875695732,
+                "a": 3.0,
+                "last": "2017_7_13_11:33:29"
+            },
+            "loadx1": {
+                "unit": "N",
+                "b": 0.0,
+                "a": -120.0,
+                "last": "2017_7_12_15:17:34"
+            }
+        },
+        "TEMP": {
+            "WWD": {
+                "unit": "WWS",
+                "b": "NaN",
+                "a": "NaN",
+                "last": "2017_7_13_9:34:8"
+            },
+            "temp1": {
+                "unit": "C",
+                "b": 0.0,
+                "a": 1.0,
+                "last": "2017-05-20,10:43"
+            }
+        },
+        "IMU": {
+            "WDDV": {
+                "unit": "WWSC",
+                "b": "NaN",
+                "a": "NaN",
+                "last": "2017_7_13_9:20:31"
+            },
+            "imu1": {
+                "unit": "Deg",
+                "b": 0.0,
+                "a": 1.0,
+                "last": "2017-05-20,10:43"
+            }
+        }
+    },
+    "false": "postTestNotes",
+    "preTestNotes": [],
     "colors": {
-        "textView_col": [
-            255,
-            255,
-            255
-        ],
         "font_col": [
             0,
             0,
             0
+        ],
+        "textView_col": [
+            255,
+            255,
+            255
         ],
         "bcg_col": [
             0,
@@ -18,81 +92,28 @@
             0
         ]
     },
-    "version": "1.0.3",
-    "maxStartAngle": 5,
-    "preTestNotes": [
-        "KUY65",
-        "ZX12",
-        "XDSDXZ",
-        "Q"
-    ],
-    "sensorBank": {
-        "LOAD_Y": {
-            "loady1": {
-                "b": 0.0,
-                "last": "2017_6_25_12:29:51",
-                "unit": "N",
-                "a": -120.0
-            }
-        },
-        "IMU": {
-            "imu1": {
-                "b": 0.0,
-                "last": "2017_6_25_12:29:46",
-                "unit": "Deg",
-                "a": 1.0
-            }
-        },
-        "HUM": {
-            "hum1": {
-                "b": 0.0,
-                "last": "2017_6_25_12:29:10",
-                "unit": "%",
-                "a": 1.0
-            }
-        },
-        "TEMP": {
-            "temp1": {
-                "b": 0.0,
-                "last": "2017_6_25_12:29:20",
-                "unit": "C",
-                "a": 1.0
-            }
-        },
-        "POT": {
-            "pot1": {
-                "b": 0.0,
-                "last": "2017_6_25_12:29:34",
-                "unit": "Deg",
-                "a": 5400.0
-            }
-        },
-        "LOAD_X": {
-            "loadx1": {
-                "b": 0.0,
-                "last": "2017_6_25_12:30:6",
-                "unit": "N",
-                "a": -120.0
-            }
-        }
-    },
-    "noteBank": [
-        "WQQWDX",
-        "DDDER"
-    ],
-    "testPlot": 41346,
-    "testHeight": 120,
-    "testFolder": "NEW4",
     "sensors": {
-        "LOAD_Y": "loady1",
-        "IMU": "imu1",
         "HUM": "hum1",
-        "TEMP": "temp1",
+        "LOAD_Y": "loady1",
+        "POT": "pot1",
         "LOAD_X": "loadx1",
-        "POT": "pot1"
+        "TEMP": "temp1",
+        "IMU": "imu1"
     },
+    "maxStartAngle": 5,
+    "testHeight": 450,
+    "noteBank": [
+        "1",
+        "1",
+        "1WQSA",
+        "1"
+    ],
+    "version": "1.0.9",
+    "operator": "TESTE",
     "postTestNotes": [
-        "WDSEEW",
-        "1WWE"
-    ]
+        "2QQA"
+    ],
+    "testFolder": "TESTDIR81111",
+    "dataConfirmFreq": 200,
+    "testPlot": 20001
 }

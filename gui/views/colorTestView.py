@@ -57,7 +57,7 @@ class ColorTestView(v.View):
         self.numStnBtnCom = 3
         self.setStnFocusNum(0)
         self.stnBtnsCols = (self.cax - 30*d.px, self.cax-15*d.px, self.cax)
-        self.stnBtnsRows = (self.cay - 16*d.py, self.cay, self.cay + 16*d.py)
+        self.stnBtnsRows = (self.cay - 18*d.py, self.cay, self.cay + 18*d.py)
         self.addStnBtns()
 #         self.font = pg.font.SysFont('Arial', int(4*d.px))
 #         self.focusSet = False
